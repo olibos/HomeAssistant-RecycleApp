@@ -6,7 +6,7 @@
     "dependencies": [],
     "config_flow": true,
     "codeowners": [
-      "olibos"
+      "@olibos"
     ],
     "requirements": [],
     "version": "1.0.0",
