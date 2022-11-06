@@ -1,0 +1,24 @@
+{
+  "title": "RecycleApp",
+  "config": {
+    "step": {
+      "setup": {
+        "description": "Entrez votre adresse",
+        "data": {
+          "zipCode": "Code Postal",
+          "street": "Rue",
+          "streetNumber": "Numéro",
+          "language": "Langue"
+        }
+      }
+    },
+    "error": {
+      "invalid_zipcode": "Aucun code postal trouvé",
+      "invalid_streetname": "Aucune rue trouvée, vérifiez l'orthographe ou recherchez une autre rue à proximité",
+      "register_failed": "Erreur lors de l'initialisation, veuillez réessayer"
+    },
+    "abort": {
+      "already_configured": "Cette adresse est déjà configurée"
+    }
+  }
+}

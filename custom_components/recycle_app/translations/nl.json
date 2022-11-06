@@ -1,0 +1,24 @@
+{
+  "title": "RecycleApp",
+  "config": {
+    "step": {
+      "setup": {
+        "description": "Vul je adres in",
+        "data": {
+          "zipCode": "Postcode",
+          "street": "Straatnaam",
+          "streetNumber": "Huisnummer",
+          "language": "Taal"
+        }
+      }
+    },
+    "error": {
+      "invalid_zipcode": "Geen postcode gevonden",
+      "invalid_streetname": "Geen straten gevonden, controleer de schrijfwijze of zoek naar een straat in jouw buurt",
+      "register_failed": "Fout tijdens initialisatie, probeer het opnieuw"
+    },
+    "abort": {
+      "already_configured": "Dit adres is al geconfigureerd"
+    }
+  }
+}

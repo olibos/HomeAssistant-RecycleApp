@@ -1,0 +1,15 @@
+{
+    "domain": "recycle_app",
+    "name": "RecycleApp",
+    "documentation": "https://github.com/olibos/HomeAssistant-RecycleApp/",
+    "issue_tracker": "https://github.com/olibos/HomeAssistant-RecycleApp/issues",
+    "dependencies": [],
+    "config_flow": true,
+    "codeowners": [
+      "olibos"
+    ],
+    "requirements": [],
+    "version": "1.0.0",
+    "iot_class": "cloud_polling"
+  }
+  

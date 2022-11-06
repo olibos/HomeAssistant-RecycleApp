@@ -1,0 +1,24 @@
+{
+    "title": "RecycleApp",
+    "config": {
+      "step": {
+        "setup": {
+          "description": "Enter your address",
+          "data": {
+            "zipCode": "Postal Code",
+            "street": "Streetname",
+            "streetNumber": "House number",
+            "language": "Language"
+          }
+        }
+      },
+      "error": {
+        "invalid_zipcode": "Invalid zip code",
+        "invalid_streetname": "Invalid street name",
+        "register_failed": "Failed to register, please try again"
+      },
+      "abort": {
+        "already_configured": "This address is already configured"
+      }
+    }
+  }
