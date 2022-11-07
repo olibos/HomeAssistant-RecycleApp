@@ -22,16 +22,16 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     api = FostPlusApi()
     _LOGGER.debug(f'Adding fractions')
 
-    zipCodeId: str = config["zipCodeId"]
-    streetId: str = config["streetId"]
-    houseNumber: int = config["houseNumber"]
+    zip_code_id: str = config["zipCodeId"]
+    street_id: str = config["streetId"]
+    house_number: int = config["houseNumber"]
     fractions: List[str] = config["fractions"]
     refresh: int = config.get("refresh", 24)
     language: str = config.get("language", "fr")
 
     async def async_update_collections():
         """Fetch data"""
-        return await hass.async_add_executor_job(api.getCollections, zipCodeId, streetId, houseNumber)
+        return await hass.async_add_executor_job(api.get_collections, zip_code_id, street_id, house_number)
 
     coordinator = DataUpdateCoordinator(
         hass,
@@ -44,10 +44,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
 
-    uniqueId = f"RecycleApp-{zipCodeId}-{streetId}-{houseNumber}"
+    unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
     device_info = {
         'identifiers': {
-            (DOMAIN, uniqueId)
+            (DOMAIN, unique_id)
         },
         'name': config.get("name", "Collecte des poubelles"),
         'manufacturer': 'Fost Plus',
@@ -55,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     }
 
     async_add_entities([RecycleAppEntity(
-        coordinator, f"{uniqueId}-{f}", f, language, device_info) for f in fractions])
+        coordinator, f"{unique_id}-{f}", f, language, device_info) for f in fractions])
 
 
 class RecycleAppEntity(CoordinatorEntity, Entity):

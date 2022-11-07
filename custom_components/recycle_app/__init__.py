@@ -6,7 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 
 from .const import DOMAIN
 
-async def async_setup(hass: HomeAssistant, config: Config) -> bool:
+async def async_setup(hass: HomeAssistant, _: Config) -> bool:
     """Set up the RecycleApp component from yaml configuration."""
     hass.data.setdefault(DOMAIN, {})
     return True

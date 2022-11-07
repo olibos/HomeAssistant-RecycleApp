@@ -21,19 +21,19 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 api = FostPlusApi()
                 language: str = info["language"]
-                zipCodeId, zipCodeName = await self.hass.async_add_executor_job(api.getZipCode, info["zipCode"], language)
-                streetId, streetName = await self.hass.async_add_executor_job(api.getStreet, info["street"], zipCodeId, language)
-                houseNumber: int = info["streetNumber"]
-                fractions = await self.hass.async_add_executor_job(api.getFractions, zipCodeId, streetId, houseNumber)
-                await self.async_set_unique_id(f"RecycleApp-{zipCodeId}-{streetId}-{houseNumber}")
+                zip_code_id, zip_code_name = await self.hass.async_add_executor_job(api.get_zip_code, info["zipCode"], language)
+                street_id, street_name = await self.hass.async_add_executor_job(api.get_street, info["street"], zip_code_id, language)
+                house_umber: int = info["streetNumber"]
+                fractions = await self.hass.async_add_executor_job(api.get_fractions, zip_code_id, street_id, house_umber)
+                await self.async_set_unique_id(f"RecycleApp-{zip_code_id}-{street_id}-{house_umber}")
                 self._abort_if_unique_id_configured()
-                name = f"{houseNumber} {streetName}, {zipCodeName}"
+                name = f"{house_umber} {street_name}, {zip_code_name}"
                 return self.async_create_entry(
                     title=name,
                     data={
-                        "zipCodeId": zipCodeId,
-                        "streetId": streetId,
-                        "houseNumber": houseNumber,
+                        "zipCodeId": zip_code_id,
+                        "streetId": street_id,
+                        "houseNumber": house_umber,
                         "fractions": fractions,
                         "name": name,
                         "refresh": 24,
@@ -44,11 +44,11 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except FostPlusApiException as error:
                 errors['base'] = error.code
 
-            except FlowError as flowError:
-                raise flowError
+            except FlowError as flow_error:
+                raise flow_error
 
             except Exception as error:
-                _LOGGER.error(f"Failed to register {error}", error)
+                _LOGGER.error(f"Failed to register {error}")
                 errors['base'] = "register_failed"
 
         return self.async_show_form(
