@@ -10,6 +10,8 @@ from .const import COLLECTION_TYPES, DOMAIN
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.device_registry import DeviceEntryType
+from homeassistant.helpers.entity import DeviceInfo
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,14 +47,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     await coordinator.async_refresh()
 
     unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
-    device_info = {
-        'identifiers': {
-            (DOMAIN, unique_id)
-        },
-        'name': config.get("name", "Collecte des poubelles"),
-        'manufacturer': 'Fost Plus',
-        'model': 'Recycle!'
-    }
+    device_info = DeviceInfo(
+        entry_type=DeviceEntryType.SERVICE,
+        identifiers={(DOMAIN, unique_id)},
+        name=config.get("name", "Collecte des poubelles"),
+        manufacturer='Fost Plus',
+        model='Recycle!'
+    )
 
     async_add_entities([RecycleAppEntity(
         coordinator, f"{unique_id}-{f}", f, language, device_info) for f in fractions])
@@ -103,7 +104,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
     @property
     def available(self) -> bool:
         return self._fraction in self.coordinator.data
-        
+
     @property
     def device_info(self) -> dict:
         return self._device_info
