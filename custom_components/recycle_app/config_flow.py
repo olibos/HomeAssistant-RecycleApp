@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowError
-
+from homeassistant.helpers.selector import selector
 from custom_components.recycle_app.api import FostPlusApi, FostPlusApiException
 
 from .const import DOMAIN
@@ -58,7 +58,12 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required("zipCode"): int,
                     vol.Required("street"): str,
                     vol.Required("streetNumber"): int,
-                    vol.Required("language", default="fr"): vol.In({"fr": "FR", "nl": "NL", "en": "EN", "de": "DE"})
+                    vol.Required("language", default="fr"): selector({
+                        "select": {
+                            "options": ["fr", "nl", "en", "de"],
+                            "mode": "dropdown"
+                        }
+                    })
                 }),
             errors=errors
         )
