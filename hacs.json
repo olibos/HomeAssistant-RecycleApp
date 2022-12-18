@@ -1,4 +1,5 @@
 {
   "name": "RecycleApp",
-  "render_readme": true
+  "render_readme": true,
+  "country": "BE"
 }
