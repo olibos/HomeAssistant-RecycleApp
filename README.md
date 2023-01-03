@@ -6,11 +6,14 @@ Integrate [RecycleApp](https://recycleapp.be/) into your Home Assistant.
 
 ## Installation
 * Install HACS Repository:
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=olibos&repository=HomeAssistant-RecycleApp&category=integration)
 * Restart Home Assistant
 * Install the Integration:
+
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=recycle_app)
 * Complete the setup process:
+
 ![image](https://user-images.githubusercontent.com/6031263/210235247-a685013c-5dc9-49c5-a8a0-372d08a215fb.png)
 
 ## Bug, ideas?
