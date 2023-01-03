@@ -17,4 +17,4 @@ Integrate [RecycleApp](https://recycleapp.be/) into your Home Assistant.
 ![image](https://user-images.githubusercontent.com/6031263/210235247-a685013c-5dc9-49c5-a8a0-372d08a215fb.png)
 
 ## Bug, ideas?
-If some collections miss, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
+If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
