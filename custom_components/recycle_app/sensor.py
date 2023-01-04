@@ -1,5 +1,5 @@
 """RecycleApp sensor."""
-from homeassistant.const import DEVICE_CLASS_DATE
+from homeassistant.components.sensor import SensorDeviceClass
 from typing import Any, Dict, List
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import Entity
@@ -79,7 +79,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_DATE
+        return SensorDeviceClass.DATE
 
     @property
     def unique_id(self) -> str:
