@@ -43,13 +43,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         update_method=async_update_collections
     )
     
-    lastRefresh = datetime.utcnow()
+    last_refresh = datetime.utcnow()
 
     @callback
     async def async_refresh(now):
-        nonlocal lastRefresh
-        if (datetime.utcnow() - lastRefresh).total_seconds() > 120:
-            lastRefresh=datetime.utcnow()
+        nonlocal last_refresh
+        if (datetime.utcnow() - last_refresh).total_seconds() > 120:
+            last_refresh=datetime.utcnow()
             _LOGGER.debug(f"async_refresh {unique_id}")
             await coordinator.async_refresh()
 
