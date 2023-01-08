@@ -96,9 +96,17 @@ class FostPlusApi:
             raise FostPlusApiException("invalid_streetname")
         return (result["items"][0]["id"], result["items"][0]["names"][language])
 
-    def get_fractions(self, zip_code_id: str, street_id: str, house_number: int, size=50) -> List[str]:
-        fractions: List[Dict[str, Dict[str, str]]] = self.__get(f"fractions?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&size={size}")["items"]
-        return [f["logo"]["id"] for f in fractions if f["logo"]["id"] in COLLECTION_TYPES]
+    def get_fractions(self, zip_code_id: str, street_id: str, house_number: int, size: int = 100) -> List[str]:
+        this_year = datetime.now().year
+        items = []
+        page = 1
+        while True:
+            response = self.__get(f'collections?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&fromDate={this_year}-01-01&untilDate={this_year}-12-31&page={page}&size={size}')
+            items += response["items"]
+            page += 1
+            if page > response["pages"]:
+                break
+        return [f for f in {f["fraction"]["logo"]["id"] for f in items if f["fraction"]["logo"]["id"] in COLLECTION_TYPES}]
 
     def get_collections(self, zip_code_id: str, street_id: str, house_number: int, from_date: date = None, until_date: date = None, size=100) -> dict[str, date]:
         if (not from_date):
