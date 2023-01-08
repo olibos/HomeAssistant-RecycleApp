@@ -3,15 +3,16 @@ from homeassistant.components.sensor import SensorDeviceClass
 from typing import Any, Dict, List
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import Entity
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 from custom_components.recycle_app.api import FostPlusApi
 from .const import COLLECTION_TYPES, DOMAIN
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.event import async_track_time_change
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,10 +29,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     street_id: str = config["streetId"]
     house_number: int = config["houseNumber"]
     fractions: List[str] = config["fractions"]
-    refresh: int = config.get("refresh", 24)
     language: str = config.get("language", "fr")
 
     async def async_update_collections():
+        _LOGGER.debug("Update collections")
         """Fetch data"""
         return await hass.async_add_executor_job(api.get_collections, zip_code_id, street_id, house_number)
 
@@ -39,12 +40,23 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         hass,
         _LOGGER,
         name='RecycleAppGetCollections',
-        update_method=async_update_collections,
-        update_interval=timedelta(hours=refresh)
+        update_method=async_update_collections
     )
+    
+    lastRefresh = datetime.utcnow()
+
+    @callback
+    async def async_refresh(now):
+        nonlocal lastRefresh
+        if (datetime.utcnow() - lastRefresh).total_seconds() > 120:
+            lastRefresh=datetime.utcnow()
+            _LOGGER.debug(f"async_refresh {unique_id}")
+            await coordinator.async_refresh()
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_refresh()
+    # Refresh every day at midnight
+    async_track_time_change(hass, async_refresh, hour=0, minute=0, second=0);
 
     unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
     device_info = DeviceInfo(
@@ -76,6 +88,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
         self._fraction = fraction
         self._language = language
         self._device_info = device_info
+        self._attr_extra_state_attributes = {"days": None}
 
     @property
     def device_class(self):
@@ -108,3 +121,13 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
     @property
     def device_info(self) -> dict:
         return self._device_info
+
+    @callback
+    def async_write_ha_state(self) -> None:
+        if (self.state):
+            delta: timedelta = self.state - datetime.now().date()
+            self._attr_extra_state_attributes["days"] = delta.days
+        else:
+            self._attr_extra_state_attributes["days"] = None
+
+        super().async_write_ha_state()
