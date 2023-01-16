@@ -106,7 +106,7 @@ class FostPlusApi:
             page += 1
             if page > response["pages"]:
                 break
-        return [f for f in {f["fraction"]["logo"]["id"] for f in items if f["fraction"]["logo"]["id"] in COLLECTION_TYPES}]
+        return [f for f in {f["fraction"]["logo"]["id"] for f in items if "logo" in f["fraction"] and f["fraction"]["logo"]["id"] in COLLECTION_TYPES}]
 
     def get_collections(self, zip_code_id: str, street_id: str, house_number: int, from_date: date = None, until_date: date = None, size=100) -> dict[str, date]:
         if (not from_date):
