@@ -24,7 +24,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 zip_code_id, zip_code_name = await self.hass.async_add_executor_job(api.get_zip_code, info["zipCode"], language)
                 street_id, street_name = await self.hass.async_add_executor_job(api.get_street, info["street"], zip_code_id, language)
                 house_umber: int = info["streetNumber"]
-                fractions = await self.hass.async_add_executor_job(api.get_fractions, zip_code_id, street_id, house_umber)
+                fractions = await self.hass.async_add_executor_job(api.get_fractions, zip_code_id, street_id, house_umber, language)
                 await self.async_set_unique_id(f"RecycleApp-{zip_code_id}-{street_id}-{house_umber}")
                 self._abort_if_unique_id_configured()
                 name = f"{house_umber} {street_name}, {zip_code_name}"

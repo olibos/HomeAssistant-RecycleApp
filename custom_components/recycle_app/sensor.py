@@ -1,6 +1,6 @@
 """RecycleApp sensor."""
 from homeassistant.components.sensor import SensorDeviceClass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, Union
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import Entity
 from datetime import datetime, timedelta
@@ -19,17 +19,18 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities):
     config: Dict = hass.data[DOMAIN][config_entry.entry_id]
-    # Update our config to include new repos and remove those that have been removed.
-    # if config_entry.options:
-    #     config.update(config_entry.options)
     api = FostPlusApi()
-    _LOGGER.debug(f'Adding fractions')
 
     zip_code_id: str = config["zipCodeId"]
     street_id: str = config["streetId"]
     house_number: int = config["houseNumber"]
-    fractions: List[str] = config["fractions"]
+    fractions: Union[List[str],Dict[str, Tuple[str, str]]] = config["fractions"]
     language: str = config.get("language", "fr")
+    _LOGGER.debug(f'zip_code_id: {zip_code_id}')
+    _LOGGER.debug(f'street_id: {street_id}')
+    _LOGGER.debug(f'house_number: {house_number}')
+    _LOGGER.debug(f'fractions: {fractions}')
+    _LOGGER.debug(f'language: {language}')
 
     async def async_update_collections():
         _LOGGER.debug("Update collections")
@@ -67,9 +68,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         model='Recycle!'
     )
 
-    async_add_entities([RecycleAppEntity(
-        coordinator, f"{unique_id}-{f}", f, language, device_info) for f in fractions])
-
+    if isinstance(fractions, dict):
+        async_add_entities([RecycleAppEntity(
+            coordinator, f"{unique_id}-{fraction}", fraction, name, device_info) for (fraction, (color, name)) in fractions.items()])
+    else:
+        _LOGGER.warn(f'Your fractions are in the v1 format, please remove and reinstall the integration.')
+        async_add_entities([RecycleAppEntity(
+            coordinator, f"{unique_id}-{fraction}", fraction, name=COLLECTION_TYPES[fraction][language], device_info=device_info) for fraction in fractions])
 
 class RecycleAppEntity(CoordinatorEntity, Entity):
     """Base class for all RecycleApp entities."""
@@ -79,14 +84,14 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
             coordinator: DataUpdateCoordinator,
             unique_id: str,
             fraction: str,
-            language: str = None,
+            name: str,
             device_info: Dict[str, Any] = None
     ):
         """Initialize the entity"""
         super().__init__(coordinator)
         self._unique_id = unique_id
         self._fraction = fraction
-        self._language = language
+        self._name = name
         self._device_info = device_info
         self._attr_extra_state_attributes = {"days": None}
 
@@ -100,7 +105,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
 
     @property
     def name(self):
-        return COLLECTION_TYPES[self._fraction][self._language]
+        return self._name
 
     @property
     def icon(self) -> str:
