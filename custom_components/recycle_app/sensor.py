@@ -6,7 +6,7 @@ from homeassistant.helpers.entity import Entity
 from datetime import datetime, timedelta
 import logging
 from custom_components.recycle_app.api import FostPlusApi
-from .const import COLLECTION_TYPES, DOMAIN
+from .const import DOMAIN, LEGACY_COLLECTION_TYPES, get_icon
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -70,11 +70,11 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
 
     if isinstance(fractions, dict):
         async_add_entities([RecycleAppEntity(
-            coordinator, f"{unique_id}-{fraction}", fraction, name, device_info) for (fraction, (color, name)) in fractions.items()])
+            coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info) for (fraction, (color, name)) in fractions.items()])
     else:
         _LOGGER.warn(f'Your fractions are in the v1 format, please remove and reinstall the integration.')
         async_add_entities([RecycleAppEntity(
-            coordinator, f"{unique_id}-{fraction}", fraction, name=COLLECTION_TYPES[fraction][language], device_info=device_info) for fraction in fractions])
+            coordinator, f"{unique_id}-{fraction}", fraction, color=LEGACY_COLLECTION_TYPES[fraction]["color"], name=LEGACY_COLLECTION_TYPES[fraction][language], device_info=device_info) for fraction in fractions])
 
 class RecycleAppEntity(CoordinatorEntity, Entity):
     """Base class for all RecycleApp entities."""
@@ -84,6 +84,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
             coordinator: DataUpdateCoordinator,
             unique_id: str,
             fraction: str,
+            color: str,
             name: str,
             device_info: Dict[str, Any] = None
     ):
@@ -91,6 +92,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
         super().__init__(coordinator)
         self._unique_id = unique_id
         self._fraction = fraction
+        self._image = get_icon(fraction, color)
         self._name = name
         self._device_info = device_info
         self._attr_extra_state_attributes = {"days": None}
@@ -113,7 +115,7 @@ class RecycleAppEntity(CoordinatorEntity, Entity):
 
     @property
     def entity_picture(self):
-        return COLLECTION_TYPES[self._fraction].get("image", None)
+        return self._image
 
     @property
     def state(self):
