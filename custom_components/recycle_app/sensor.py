@@ -75,7 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         async_add_entities([RecycleAppEntity(
             coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info) for (fraction, (color, name)) in fractions.items()])
     else:
-        _LOGGER.warn(f'Your fractions are in the v1 format, please remove and reinstall the integration.')
+        _LOGGER.warn(f'Your fractions are in the v1 format, please go to Settings>Devices select this integration > configure and click submit.')
         async_add_entities([RecycleAppEntity(
             coordinator, f"{unique_id}-{fraction}", fraction, color=LEGACY_COLLECTION_TYPES[fraction]["color"], name=LEGACY_COLLECTION_TYPES[fraction][language], device_info=device_info) for fraction in fractions])
 
