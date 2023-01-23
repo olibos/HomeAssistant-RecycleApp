@@ -19,13 +19,16 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities):
     config: Dict = hass.data[DOMAIN][config_entry.entry_id]
+    options = config_entry.options
     api = FostPlusApi()
 
     zip_code_id: str = config["zipCodeId"]
     street_id: str = config["streetId"]
     house_number: int = config["houseNumber"]
-    fractions: Union[List[str],Dict[str, Tuple[str, str]]] = config["fractions"]
-    language: str = config.get("language", "fr")
+    # Cleanup required in v2
+    # Remove List[str] and fallback to config.
+    fractions: Union[List[str],Dict[str, Tuple[str, str]]] = options.get("fractions", config.get("fractions"))
+    language: str = options.get("language", config.get("language", "fr"))
     _LOGGER.debug(f'zip_code_id: {zip_code_id}')
     _LOGGER.debug(f'street_id: {street_id}')
     _LOGGER.debug(f'house_number: {house_number}')
