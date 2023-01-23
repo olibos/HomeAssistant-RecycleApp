@@ -16,5 +16,26 @@ Integrate [RecycleApp](https://recycleapp.be/) into your Home Assistant.
 
 ![image](https://user-images.githubusercontent.com/6031263/210235247-a685013c-5dc9-49c5-a8a0-372d08a215fb.png)
 
+## Migration from v1.x to >= v1.5.0
+This new version will retrieve labels and color from Fostplus API.
+
+You need to migrate the data structure of this integration, you should see this warning in HA logs:
+![image](https://user-images.githubusercontent.com/6031263/214088093-a8bd21c4-0ba1-4570-982c-5242ab1f8078.png)
+
+To update:
+- Settings
+- Devices
+- Select this integration
+- Click on "Configure" and in the popup click "Submit"
+
+To validate, restart HA and the warning should be erased.
+
+If you've multiple addresses configured, repeat the same process for each address.
+
+Normally, all existing sensor should keep their IDs.
+
+## Breaking changes V2
+In V2, the old data structure will be completely removed, so please update it before 😉
+
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
