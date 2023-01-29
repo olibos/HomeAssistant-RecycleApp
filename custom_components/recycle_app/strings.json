@@ -1,23 +1,36 @@
 {
-    "config": {
-      "step": {
-        "setup": {
-          "description": "Enter your address",
-          "data": {
-            "zipCode": "Postal Code",
-            "street": "Streetname",
-            "streetNumber": "House number",
-            "language": "Language"
-          }
+  "config": {
+    "step": {
+      "setup": {
+        "description": "Enter your address",
+        "data": {
+          "zipCode": "Postal Code",
+          "street": "Streetname",
+          "streetNumber": "House number",
+          "language": "Language"
         }
-      },
-      "error": {
-        "invalid_zipcode": "Invalid zip code",
-        "invalid_streetname": "Invalid street name",
-        "register_failed": "Failed to register, please try again"
-      },
-      "abort": {
-        "already_configured": "This address is already configured"
       }
+    },
+    "error": {
+      "invalid_zipcode": "Invalid zip code",
+      "invalid_streetname": "Invalid street name",
+      "register_failed": "Failed to register, please try again"
+    },
+    "abort": {
+      "already_configured": "This address is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "The integration will update all collection information upon submission.",
+        "data": {
+          "language": "Language"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unknown error"
     }
   }
+}

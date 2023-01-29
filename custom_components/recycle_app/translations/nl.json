@@ -19,5 +19,18 @@
     "abort": {
       "already_configured": "Dit adres is al geconfigureerd"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening.",
+        "data": {
+          "language": "Taal"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unknown error"
+    }
   }
 }

@@ -19,5 +19,18 @@
     "abort": {
       "already_configured": "Cette adresse est déjà configurée"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "L'intégration mettra à jour toutes les informations relatives aux collectes lors de la soumission.",
+        "data": {
+          "language": "Langue"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unknown error"
+    }
   }
 }
