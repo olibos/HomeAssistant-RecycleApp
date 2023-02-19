@@ -91,9 +91,14 @@ class FostPlusApi:
         return (item["id"], f'{item["code"]} - {item["names"][0][language]}')
 
     def get_street(self, street: str, zip_code_id: str, language: str = "fr") -> tuple[str, str]:
+        street = street.strip().lower()
         result = self.__post(f"streets?q={street}&zipcodes={zip_code_id}")
         if result["total"] != 1:
-            raise FostPlusApiException("invalid_streetname")
+            item = next((i for i in result["items"] if i["names"][language].strip().lower() == street), None)
+            if (not item):
+                raise FostPlusApiException("invalid_streetname")
+            return (item["id"], item["names"][language])
+
         return (result["items"][0]["id"], result["items"][0]["names"][language])
 
     def get_fractions(self, zip_code_id: str, street_id: str, house_number: int, language: str, size: int = 100) -> Dict[str, Tuple[str, str]]:
