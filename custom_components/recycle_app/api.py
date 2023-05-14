@@ -33,7 +33,7 @@ class FostPlusApi:
         self.__ensure_initialization()
         html = self.__session.get("https://www.recycleapp.be/").text
         script_url = next(re.finditer(
-            r"src=\"([^\"]+main\.[^\"]+\.js)\"", html)).group(1)
+            r"src=\"([a-zA-Z0-9/_-]{1,50}main\.[a-f0-9]{8}\.chunk\.js)\"", html)).group(1)
         script = self.__session.get("https://www.recycleapp.be/" + script_url).text
         return next(re.finditer(r"\"(\w{200,})\"", script)).group(1)
 
