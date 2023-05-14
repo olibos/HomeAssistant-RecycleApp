@@ -1,6 +1,6 @@
 from array import array
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from requests import Session
 import re
 
@@ -11,7 +11,7 @@ _accessToken: str = ""
 
 
 class FostPlusApi:
-    __session: Session = None
+    __session: Optional[Session] = None
     __endpoint: str
 
     def __ensure_initialization(self):

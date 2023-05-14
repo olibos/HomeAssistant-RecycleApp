@@ -73,7 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         async_add_entities([RecycleAppEntity(
             coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info) for (fraction, (color, name)) in fractions.items()])
     else:
-        _LOGGER.error(f'Your fractions are in the v1 format... Please delete this address and restart.')
+        _LOGGER.error('Your fractions are in the v1 format... Please delete this address and restart.')
 
 class RecycleAppEntity(CoordinatorEntity, Entity):
     """Base class for all RecycleApp entities."""
