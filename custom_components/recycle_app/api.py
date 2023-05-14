@@ -1,20 +1,22 @@
 from array import array
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from requests import Session
 import re
 
 from custom_components.recycle_app.const import COLLECTION_TYPES
 
-_secret: str = "8eTFgy3AQH0mzAcj3xMwaKnNyNnijEFIEegjgNpBHifqtQ4IEyWqmJGFz3ggKQ7B4vwUYS8xz8KwACZihCmboGb6brtVB3rpne2Ww5uUM2n3i4SKNUg6Vp7lhAS8INDUNH8Ll7WPhWRsQOXBCjVz5H8fr0q6fqZCosXdndbNeiNy73FqJBn794qKuUAPTFj8CuAbwI6Wom98g72Px1MPRYHwyrlHUbCijmDmA2zoWikn34LNTUZPd7kS0uuFkibkLxCc1PeOVYVHeh1xVxxwGBsMINWJEUiIBqZt9VybcHpUJTYzureqfund1aeJvmsUjwyOMhLSxj9MLQ07iTbvzQa6vbJdC0hTsqTlndccBRm9lkxzNpzJBPw8VpYSyS3AhaR2U1n4COZaJyFfUQ3LUBzdj5gV8QGVGCHMlvGJM0ThnRKENSWZLVZoHHeCBOkfgzp0xl0qnDtR8eJF0vLkFiKwjX7DImGoA8IjqOYygV3W9i9rIOfK"
+_secret: str = ""
 _accessToken: str = ""
 
 
 class FostPlusApi:
-    __session: Session
+    __session: Optional[Session] = None
     __endpoint: str
 
-    def __init__(self) -> None:
+    def __ensure_initialization(self):
+        if (self.__session): return
+
         self.__session = Session()
         self.__session.headers.update(
             {
@@ -23,18 +25,20 @@ class FostPlusApi:
                 "User-Agent": "HomeAssistant-RecycleApp",
                 "x-consumer": "recycleapp.be"
             })
-        self.__endpoint = "https://api.fostplus.be/recycle-public/app/v1"
-        # self.__session.get(
-        #     "https://recycleapp.be/config/app.settings.json").json()["API"]
+
+        base_url = self.__session.get("https://recycleapp.be/config/app.settings.json").json()["API"]
+        self.__endpoint = f"{base_url}/app/v1"
 
     def __get_secret(self) -> str:
+        self.__ensure_initialization()
         html = self.__session.get("https://www.recycleapp.be/").text
         script_url = next(re.finditer(
-            r"src=\"([^\"]+main\.[^\"]+\.js)\"", html)).group(1)
+            r"src=\"([a-zA-Z0-9/_-]{1,50}main\.[a-f0-9]{8}\.chunk\.js)\"", html)).group(1)
         script = self.__session.get("https://www.recycleapp.be/" + script_url).text
         return next(re.finditer(r"\"(\w{200,})\"", script)).group(1)
 
     def __get_access_token(self) -> str:
+        self.__ensure_initialization()
         for _ in range(2):
             response = self.__session.get(
                 f"{self.__endpoint}/access-token", headers={"x-secret": self.secret})
@@ -60,6 +64,7 @@ class FostPlusApi:
         return _accessToken
 
     def __post(self, action: str, data=None):
+        self.__ensure_initialization()
         for _ in range(2):
             headers = {"Authorization": self.access_token}
             response = self.__session.post(
@@ -72,6 +77,7 @@ class FostPlusApi:
                 _accessToken = None
 
     def __get(self, action: str):
+        self.__ensure_initialization()
         for _ in range(2):
             headers = {"Authorization": self.access_token}
             response = self.__session.get(

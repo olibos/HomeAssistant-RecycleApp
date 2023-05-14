@@ -1,12 +1,12 @@
 """RecycleApp sensor."""
 from homeassistant.components.sensor import SensorDeviceClass
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, Tuple
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.entity import Entity
 from datetime import datetime, timedelta
 import logging
 from custom_components.recycle_app.api import FostPlusApi
-from .const import DOMAIN, LEGACY_COLLECTION_TYPES, get_icon
+from .const import DOMAIN, get_icon
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -25,10 +25,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     zip_code_id: str = config["zipCodeId"]
     street_id: str = config["streetId"]
     house_number: int = config["houseNumber"]
-    # Cleanup required in v2
-    # Remove List[str] and fallback to config.
-    fractions: Union[List[str],Dict[str, Tuple[str, str]]] = options.get("fractions", config.get("fractions"))
-    language: str = options.get("language", config.get("language", "fr"))
+    fractions: Dict[str, Tuple[str, str]] = options.get("fractions")
+    language: str = options.get("language", "fr")
     _LOGGER.debug(f'zip_code_id: {zip_code_id}')
     _LOGGER.debug(f'street_id: {street_id}')
     _LOGGER.debug(f'house_number: {house_number}')
@@ -75,9 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
         async_add_entities([RecycleAppEntity(
             coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info) for (fraction, (color, name)) in fractions.items()])
     else:
-        _LOGGER.warn(f'Your fractions are in the v1 format, please go to Settings>Devices select this integration > configure and click submit.')
-        async_add_entities([RecycleAppEntity(
-            coordinator, f"{unique_id}-{fraction}", fraction, color=LEGACY_COLLECTION_TYPES[fraction]["color"], name=LEGACY_COLLECTION_TYPES[fraction][language], device_info=device_info) for fraction in fractions])
+        _LOGGER.error('Your fractions are in the v1 format... Please delete this address and restart.')
 
 class RecycleAppEntity(CoordinatorEntity, Entity):
     """Base class for all RecycleApp entities."""
