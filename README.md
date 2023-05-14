@@ -35,7 +35,7 @@ If you've multiple addresses configured, repeat the same process for each addres
 Normally, all existing sensor should keep their IDs.
 
 ## Breaking changes V2
-In V2, the old data structure will be completely removed, so please update it before 😉
+In V2, the old data structure is completely removed, so please update it before 😉
 
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).

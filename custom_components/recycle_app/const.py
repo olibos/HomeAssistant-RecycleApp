@@ -22,71 +22,11 @@ COLLECTION_TYPES = {
     "5d610b86162c063cc0400102": '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" style="background:##COLOR##;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;image-rendering:optimizeQuality;fill-rule:evenodd;clip-rule:evenodd"><path fill="#fefffe" d="M51.5-.5h24c27.667 7 45 24.333 52 52v24c-7 27.667-24.333 45-52 52h-24c-27.658-6.991-44.991-24.325-52-52v-24c7-27.667 24.333-45 52-52Zm7 4c36.277.45 57.777 18.45 64.5 54 1.177 31.49-12.99 52.656-42.5 63.5a30.463 30.463 0 0 1-9 1.5v-16c9.751-.806 18.751-3.806 27-9-8.776-2.443-15.11-7.776-19-16a96.39 96.39 0 0 1 11-2.5c.457-.414.79-.914 1-1.5-8.549-3.715-14.549-9.882-18-18.5a52.204 52.204 0 0 0 10-1.5c-8.915-4.45-15.581-11.117-20-20-4.326 8.993-10.993 15.66-20 20l10 2c-3.674 8.34-9.674 14.34-18 18 3.75 1.941 7.75 3.274 12 4-3.684 8.36-10.017 13.693-19 16 8.249 5.194 17.249 8.194 27 9v16c-32.16-6.499-49.494-26.166-52-59 3.12-34.115 21.454-54.115 55-60Z" style="opacity:.878"/></svg>'
 }
 
-# Will be removed in v2.0
-LEGACY_COLLECTION_TYPES = {
-    "5d610b86162c063cc0400108": {
-        "nl": "Groente-, fruit-, tuinafval",
-        "fr": "Déchets biodégradables",
-        "de": "Bioabfall",
-        "en": "Biodegradable waste",
-        "color": "#638919"
-    },
-    "5d610b86162c063cc0400125": {
-        "nl": "PMD",
-        "fr": "PMC",
-        "en": "PMD",
-        "de": "PMD",
-        "color": "#60b1df"
-    },
-    "5d610b86162c063cc0400123": {
-        "nl": "Papier",
-        "fr": "Papier",
-        "de": "Papier",
-        "en": "Paper",
-        "color": "#f2b03b"
-    },
-    "5d610b86162c063cc0400112": {
-        "nl": "Restafval zak",
-        "fr": "Déchets non recyclables sac",
-        "de": "Restabfall tasche",
-        "en": "Non-recyclable waste bag",
-        "color": "#777"
-    },
-    "5d610b86162c063cc0400127": {
-        "nl": "Snoeiafval",
-        "fr": "Résidus de taille",
-        "de": "Schneideabfälle",
-        "en": "Pruning waste",
-        "color": "#638919"
-    },
-    "5d610b86162c063cc0400133": {
-        "nl": "Restafval",
-        "fr": "Déchets non recyclables",
-        "de": "Restabfall",
-        "en": "Non-recyclable waste",
-        "color": "#608282"
-    },
-    "5d610b86162c063cc0400110": {
-        "nl": "Glas",
-        "fr": "Verre",
-        "de": "Glas",
-        "en": "Glass",
-        "color": "#e56e36"
-    },
-    "5d610b86162c063cc0400102": {
-        "nl": "Kerstbomen",
-        "fr": "Sapins de Noël",
-        "en": "Christmas trees",
-        "color": "#006d62"
-    }
-}
-
 # Some cities use another icon for the same purpose, to avoid duplication
 # I'll just make alias entries
 
 # Wetteren (https://github.com/olibos/HomeAssistant-RecycleApp/issues/4)
 COLLECTION_TYPES["5d610b86162c063cc0400111"] = COLLECTION_TYPES["5d610b86162c063cc0400108"]
-LEGACY_COLLECTION_TYPES["5d610b86162c063cc0400111"] = LEGACY_COLLECTION_TYPES["5d610b86162c063cc0400108"]
 
 def get_icon(id: str, color: str):
     svg = COLLECTION_TYPES.get(id)
