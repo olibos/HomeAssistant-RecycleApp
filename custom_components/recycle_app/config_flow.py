@@ -93,13 +93,13 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             street_id = self.config_entry.data.get("streetId")
             house_umber = self.config_entry.data.get("houseNumber")
             language = user_input.get("language", "fr")
-            format = user_input.get("format", DEFAULT_DATE_FORMAT)
+            date_format = user_input.get("format", DEFAULT_DATE_FORMAT)
             fractions = await self.hass.async_add_executor_job(api.get_fractions, zip_code_id, street_id, house_umber, language)
             return self.async_create_entry(
                 title="",
                 data={
                     "language": language,
-                    "format": format,
+                    "format": date_format,
                     "fractions": fractions
                 })
 

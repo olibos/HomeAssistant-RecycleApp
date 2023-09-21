@@ -26,13 +26,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
     house_number: int = config["houseNumber"]
     fractions: Dict[str, Tuple[str, str]] = options.get("fractions")
     language: str = options.get("language", "fr")
-    format: str = options.get("format", DEFAULT_DATE_FORMAT)
+    date_format: str = options.get("format", DEFAULT_DATE_FORMAT)
     _LOGGER.debug(f'zip_code_id: {zip_code_id}')
     _LOGGER.debug(f'street_id: {street_id}')
     _LOGGER.debug(f'house_number: {house_number}')
     _LOGGER.debug(f'fractions: {fractions}')
     _LOGGER.debug(f'language: {language}')
-    _LOGGER.debug(f'format: {format}')
+    _LOGGER.debug(f'format: {date_format}')
 
     async def async_update_collections():
         _LOGGER.debug("Update collections")
@@ -72,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: config_entries.Co
 
     if isinstance(fractions, dict):
         async_add_entities([RecycleAppEntity(
-            coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info, format) for (fraction, (color, name)) in fractions.items()])
+            coordinator, f"{unique_id}-{fraction}", fraction, color, name, device_info, date_format) for (fraction, (color, name)) in fractions.items()])
     else:
         _LOGGER.error(
             'Your fractions are in the v1 format... Please delete this address and restart.')
@@ -89,7 +89,7 @@ class RecycleAppEntity(CoordinatorEntity, SensorEntity):
             color: str,
             name: str,
             device_info: Dict[str, Any] = None,
-            format = DEFAULT_DATE_FORMAT
+            date_format = DEFAULT_DATE_FORMAT
     ):
         """Initialize the entity"""
         super().__init__(coordinator)
@@ -99,7 +99,7 @@ class RecycleAppEntity(CoordinatorEntity, SensorEntity):
         self._name = name
         self._device_info = device_info
         self._attr_extra_state_attributes = {"days": None}
-        self._format = format
+        self._date_format = date_format
 
     @property
     def device_class(self):
@@ -128,7 +128,7 @@ class RecycleAppEntity(CoordinatorEntity, SensorEntity):
         if (value is None):
             return None
 
-        return value.strftime(self._format)
+        return value.strftime(self._date_format)
 
     @property
     def native_value(self) -> date | None:
