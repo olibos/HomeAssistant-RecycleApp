@@ -7,7 +7,7 @@ from homeassistant.data_entry_flow import FlowError, FlowResult
 from homeassistant.helpers.selector import selector
 from custom_components.recycle_app.api import FostPlusApi, FostPlusApiException
 
-from .const import DOMAIN
+from .const import DEFAULT_DATE_FORMAT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -93,11 +93,13 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             street_id = self.config_entry.data.get("streetId")
             house_umber = self.config_entry.data.get("houseNumber")
             language = user_input.get("language", "fr")
+            format = user_input.get("format", DEFAULT_DATE_FORMAT)
             fractions = await self.hass.async_add_executor_job(api.get_fractions, zip_code_id, street_id, house_umber, language)
             return self.async_create_entry(
                 title="",
                 data={
-                    "language": user_input.get("language"),
+                    "language": language,
+                    "format": format,
                     "fractions": fractions
                 })
 
@@ -110,7 +112,8 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
                             "options": ["fr", "nl", "en", "de"],
                             "mode": "dropdown"
                         }
-                    })
+                    }),
+                    vol.Required("format", default=self.config_entry.options.get("format", DEFAULT_DATE_FORMAT)): str
                 }
             ),
         )

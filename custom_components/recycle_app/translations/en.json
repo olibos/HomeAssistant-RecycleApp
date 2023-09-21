@@ -25,7 +25,8 @@
       "init": {
         "description": "The integration will update all collection information upon submission.",
         "data": {
-          "language": "Language"
+          "language": "Language",
+          "format": "Date Format"
         }
       }
     },

@@ -16,6 +16,15 @@ Integrate [RecycleApp](https://recycleapp.be/) into your Home Assistant.
 
 ![image](https://user-images.githubusercontent.com/6031263/210235247-a685013c-5dc9-49c5-a8a0-372d08a215fb.png)
 
+## Date Format
+By default, dates are in Home Assistant date format: %Y-%m-%d
+
+You can customize the format in the `configure` of the device:
+
+![image](https://github.com/olibos/HomeAssistant-RecycleApp/assets/6031263/7eec3a92-4d72-4908-aa15-72aec30446fc)
+
+The formatting is based on [Python date formatting](https://docs.python.org/3/library/datetime.html#format-codes).
+
 ## Migration from v1.x to >= v1.5.0
 This new version will retrieve labels and color from Fostplus API.
 

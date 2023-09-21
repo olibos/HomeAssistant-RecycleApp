@@ -25,7 +25,8 @@
       "init": {
         "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening.",
         "data": {
-          "language": "Taal"
+          "language": "Taal",
+          "format": "Datumformaat"
         }
       }
     },
