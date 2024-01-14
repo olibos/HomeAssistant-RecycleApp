@@ -67,7 +67,7 @@ action:
       message: Tomorrow waste collection of {{states('sensor.tomorrow_s_pickup_s')}}
 mode: single
 ```
-Thanks to @MathiasVandePol for the sample.
+Thanks to [@MathiasVandePol](https://github.com/MathiasVandePol) for the sample.
 
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
