@@ -25,26 +25,49 @@ You can customize the format in the `configure` of the device:
 
 The formatting is based on [Python date formatting](https://docs.python.org/3/library/datetime.html#format-codes).
 
-## Migration from v1.x to >= v1.5.0
-This new version will retrieve labels and color from Fostplus API.
+## Usage Samples
 
-You need to migrate the data structure of this integration, you should see this warning in HA logs:
-![image](https://user-images.githubusercontent.com/6031263/214088093-a8bd21c4-0ba1-4570-982c-5242ab1f8078.png)
+### Dashboard with next pickups
+With [entity-filter](https://www.home-assistant.io/dashboards/entity-filter/):
+![entity-filter](docs/images/entity-filter.png)
 
-To update:
-- Settings
-- Devices
-- Select this integration
-- Click on "Configure" and in the popup click "Submit"
+### Templates
+![templates](docs/images/templates.png)
 
-To validate, restart HA and the warning should be erased.
+### Tomorrow's Pickup(s)
+#### Template helper
+![tomorrows](docs/images/tomorrow.png)
+#### Code:
+```jinja
+{% set tomorrow_pickups = namespace(entities=[]) %}
+{% set collect_types = ['sensor.dechets_non_recyclables_sac', 'sensor.pmc', 'sensor.papier'] %}
+{% for collect_type in collect_types %}
+  {% if state_attr(collect_type, 'days') == 1 %}
+    {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
+  {% endif %}
+{% endfor %}
+{{ tomorrow_pickups.entities |join(' - ') }}
+```
 
-If you've multiple addresses configured, repeat the same process for each address.
-
-Normally, all existing sensor should keep their IDs.
-
-## Breaking changes V2
-In V2, the old data structure is completely removed, so please update it before 😉
+#### Notification
+```yml
+alias: Waste collection
+description: ""
+trigger:
+  - platform: time
+    at: "19:00:00"
+condition:
+  - condition: template
+    value_template: >-
+      {% if is_state('sensor.tomorrow_s_pickup_s', '') %}false{% else %}true{%
+      endif %}
+action:
+  - service: notify.mobile_app_poco_f5
+    data:
+      message: Tomorrow waste collection of {{states('sensor.tomorrow_s_pickup_s')}}
+mode: single
+```
+Thanks to @MathiasVandePol for the sample.
 
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
