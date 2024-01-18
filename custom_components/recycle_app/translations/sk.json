@@ -1,0 +1,37 @@
+{
+  "config": {
+    "step": {
+      "setup": {
+        "description": "Zadajte Vašu adresu",
+        "data": {
+          "zipCode": "PSČ",
+          "street": "Názov ulice",
+          "streetNumber": "Číslo domu",
+          "language": "Jazyk"
+        }
+      }
+    },
+    "error": {
+      "invalid_zipcode": "Nesprávne PSČ",
+      "invalid_streetname": "Nesprávny názov ulice",
+      "register_failed": "Registrácia zlyhala, skúste to znova"
+    },
+    "abort": {
+      "already_configured": "Táto adresa je už nakonfigurovaná"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Integrácia aktualizuje všetky informácie o kolekcii pri odoslaní.",
+        "data": {
+          "language": "Jazyk",
+          "format": "Formát dátumu"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Neznáma chyba"
+    }
+  }
+}
