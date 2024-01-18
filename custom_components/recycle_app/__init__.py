@@ -65,6 +65,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     last_refresh = datetime.now()
+    unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
 
     @callback
     async def async_refresh(now):
@@ -79,7 +80,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Refresh every day at midnight
     async_track_time_change(hass, async_refresh, hour=0, minute=0, second=0)
 
-    unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
     device_info = DeviceInfo(
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, unique_id)},
@@ -88,10 +88,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         model="Recycle!",
     )
 
-    # Forward the setup to the sensor platform.
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "sensor")
-    )
+    for platform in PLATFORMS:
+        # Forward the setup to the target platform.
+        hass.async_create_task(
+            hass.config_entries.async_forward_entry_setup(entry, platform)
+        )
 
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
