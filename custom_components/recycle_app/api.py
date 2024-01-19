@@ -7,13 +7,12 @@ from typing import Optional
 from custom_components.recycle_app.const import COLLECTION_TYPES
 from requests import Session
 
-_secret: str = ""
-_accessToken: str = ""
-
 
 class FostPlusApi:
     __session: Optional[Session] = None
     __endpoint: str
+    __secret: str = None
+    __access_token: str = None
 
     def __ensure_initialization(self):
         if self.__session:
@@ -54,23 +53,20 @@ class FostPlusApi:
             if response.status_code == 200:
                 return response.json()["accessToken"]
             if response.status_code == 401:
-                global _secret
-                _secret = None
+                FostPlusApi.__secret = None
 
     @property
     def secret(self) -> str:
-        global _secret
-        if not _secret:
-            _secret = self.__get_secret()
-        return _secret
+        if not FostPlusApi.__secret:
+            FostPlusApi.__secret = self.__get_secret()
+        return FostPlusApi.__secret
 
     @property
     def access_token(self) -> str:
-        global _accessToken
-        if not _accessToken:
-            _accessToken = self.__get_access_token()
+        if not FostPlusApi.__access_token:
+            FostPlusApi.__access_token = self.__get_access_token()
 
-        return _accessToken
+        return FostPlusApi.__access_token
 
     def __post(self, action: str, data=None):
         self.__ensure_initialization()
@@ -83,8 +79,7 @@ class FostPlusApi:
                 return response.json()
 
             if response.status_code == 401:
-                global _accessToken
-                _accessToken = None
+                FostPlusApi.__access_token = None
 
     def __get(self, action: str):
         self.__ensure_initialization()
@@ -97,8 +92,7 @@ class FostPlusApi:
                 return response.json()
 
             if response.status_code == 401:
-                global _accessToken
-                _accessToken = None
+                FostPlusApi.__access_token = None
 
     def get_zip_code(self, zip_code: int, language: str = "fr") -> tuple[str, str]:
         result = self.__get(f"zipcodes?q={zip_code}")
