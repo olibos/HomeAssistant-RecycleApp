@@ -1,5 +1,5 @@
 """Custom integration to integrate RecycleApp with Home Assistant."""
-from datetime import datetime
+from datetime import date, datetime
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN
+from .info import AppInfo
 
 PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
 _LOGGER = logging.getLogger(__name__)
@@ -31,8 +32,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the RecycleApp component from a ConfigEntry."""
     hass.data.setdefault(DOMAIN, {})
 
-    hass.data[DOMAIN][entry.entry_id] = entry.data
-
     config = entry.data
     options = entry.options
     api = FostPlusApi()
@@ -50,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.debug(f"language: {language}")
     _LOGGER.debug(f"format: {date_format}")
 
-    async def async_update_collections():
+    async def async_update_collections() -> dict[str, list[date]]:
         """Fetch data."""
         _LOGGER.debug("Update collections")
         return await hass.async_add_executor_job(
@@ -86,6 +85,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=config.get("name", "Collecte des poubelles"),
         manufacturer="Fost Plus",
         model="Recycle!",
+    )
+
+    hass.data[DOMAIN][entry.entry_id] = AppInfo(
+        collect_device=device_info, collect_coordinator=coordinator, unique_id=unique_id
     )
 
     for platform in PLATFORMS:
