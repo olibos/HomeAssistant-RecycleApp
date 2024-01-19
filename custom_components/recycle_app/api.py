@@ -158,12 +158,12 @@ class FostPlusApi:
         from_date: date = None,
         until_date: date = None,
         size=100,
-    ) -> dict[str, date]:
+    ) -> dict[str, list[date]]:
         if not from_date:
             from_date = datetime.now()
         if not until_date:
             until_date = from_date + timedelta(weeks=8)
-        result = {}
+        result: dict[str, list[date]] = {}
         EMPTY_DICT = {}
         collections: array[dict] = self.__get(
             f'collections?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&fromDate={from_date.strftime("%Y-%m-%d")}&untilDate={until_date.strftime("%Y-%m-%d")}&size={size}'
@@ -171,16 +171,21 @@ class FostPlusApi:
         for item in collections:
             if item.get("exception", EMPTY_DICT).get("replacedBy", None):
                 continue
+
             fraction_id = (
                 item.get("fraction", EMPTY_DICT).get("logo", EMPTY_DICT).get("id", None)
             )
+
             if fraction_id not in COLLECTION_TYPES:
                 continue
-            parts = item.get("timestamp", "2999-12-31T").split("T")[0].split("-")
+
+            parts = item.get("timestamp", "").split("T")[0].split("-")
+            if not parts[0]:
+                continue
+
             collection_date = date(int(parts[0]), int(parts[1]), int(parts[2]))
-            current_date = result.get(fraction_id, date.max)
-            if collection_date < current_date:
-                result[fraction_id] = collection_date
+            result.setdefault(fraction_id, [])
+            result[fraction_id].append(collection_date)
 
         return result
 
