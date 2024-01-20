@@ -6,16 +6,13 @@ from typing import Any, final
 from homeassistant import config_entries
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.device_registry import DeviceEntryType
-from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
 
-from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon
+from .info import AppInfo
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,71 +20,21 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities
 ):
-    config: dict = hass.data[DOMAIN][config_entry.entry_id]
-    options = config_entry.options
-    api = FostPlusApi()
-
-    zip_code_id: str = config["zipCodeId"]
-    street_id: str = config["streetId"]
-    house_number: int = config["houseNumber"]
-    fractions: dict[str, tuple[str, str]] = options.get("fractions")
-    language: str = options.get("language", "fr")
-    date_format: str = options.get("format", DEFAULT_DATE_FORMAT)
-    _LOGGER.debug(f"zip_code_id: {zip_code_id}")
-    _LOGGER.debug(f"street_id: {street_id}")
-    _LOGGER.debug(f"house_number: {house_number}")
-    _LOGGER.debug(f"fractions: {fractions}")
-    _LOGGER.debug(f"language: {language}")
-    _LOGGER.debug(f"format: {date_format}")
-
-    async def async_update_collections():
-        """Fetch data."""
-        _LOGGER.debug("Update collections")
-        return await hass.async_add_executor_job(
-            api.get_collections, zip_code_id, street_id, house_number
-        )
-
-    coordinator = DataUpdateCoordinator(
-        hass,
-        _LOGGER,
-        name="RecycleAppGetCollections",
-        update_method=async_update_collections,
-    )
-
-    last_refresh = datetime.now()
-
-    @callback
-    async def async_refresh(now):
-        nonlocal last_refresh
-        if (datetime.now() - last_refresh).total_seconds() > 120:
-            last_refresh = datetime.now()
-            _LOGGER.debug(f"async_refresh {unique_id}")
-            await coordinator.async_refresh()
-
-    # Fetch initial data so we have data when entities subscribe
-    await coordinator.async_refresh()
-    # Refresh every day at midnight
-    async_track_time_change(hass, async_refresh, hour=0, minute=0, second=0)
-
-    unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
-    device_info = DeviceInfo(
-        entry_type=DeviceEntryType.SERVICE,
-        identifiers={(DOMAIN, unique_id)},
-        name=config.get("name", "Collecte des poubelles"),
-        manufacturer="Fost Plus",
-        model="Recycle!",
-    )
+    app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
+    fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
+    unique_id = app_info["unique_id"]
+    date_format: str = config_entry.options.get("format", DEFAULT_DATE_FORMAT)
 
     if isinstance(fractions, dict):
         async_add_entities(
             [
                 RecycleAppEntity(
-                    coordinator,
+                    app_info["collect_coordinator"],
                     f"{unique_id}-{fraction}",
                     fraction,
                     color,
                     name,
-                    device_info,
+                    app_info["collect_device"],
                     date_format,
                 )
                 for (fraction, (color, name)) in fractions.items()
@@ -99,12 +46,14 @@ async def async_setup_entry(
         )
 
 
-class RecycleAppEntity(CoordinatorEntity, SensorEntity):
+class RecycleAppEntity(
+    CoordinatorEntity[DataUpdateCoordinator[dict[str, list[date]]]], SensorEntity
+):
     """Base class for all RecycleApp entities."""
 
     def __init__(
         self,
-        coordinator: DataUpdateCoordinator,
+        coordinator: DataUpdateCoordinator[dict[str, list[date]]],
         unique_id: str,
         fraction: str,
         color: str,
@@ -154,7 +103,7 @@ class RecycleAppEntity(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> date | None:
         return (
-            self.coordinator.data[self._fraction]
+            self.coordinator.data[self._fraction][0]
             if self._fraction in self.coordinator.data
             else None
         )
