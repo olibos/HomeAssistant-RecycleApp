@@ -1,5 +1,6 @@
 """RecycleApp Calendar."""
 from datetime import date, datetime
+from typing import Optional
 
 from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
@@ -73,7 +74,7 @@ class RecycleAppCalendarEntity(
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
         next_collect: date = date.max
-        labels: list[str] = None
+        labels: Optional[list[str]] = None
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = async_get_entity_registry(self.hass)
         for fraction_id, event_dates in self.coordinator.data.items():

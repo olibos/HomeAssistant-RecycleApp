@@ -11,8 +11,8 @@ from requests import Session
 class FostPlusApi:
     __session: Optional[Session] = None
     __endpoint: str
-    __secret: str = None
-    __access_token: str = None
+    __secret: Optional[str] = None
+    __access_token: Optional[str] = None
 
     def __ensure_initialization(self):
         if self.__session:
