@@ -20,6 +20,31 @@
       "already_configured": "This address is already configured"
     }
   },
+  "entity": {
+    "sensor": {
+      "opening_hours_monday": {
+        "name": "Monday"
+      },
+      "opening_hours_tuesday": {
+        "name": "Tuesday"
+      },
+      "opening_hours_wednesday": {
+        "name": "Wednesday"
+      },
+      "opening_hours_thursday": {
+        "name": "Thursday"
+      },
+      "opening_hours_friday": {
+        "name": "Friday"
+      },
+      "opening_hours_saturday": {
+        "name": "Saturday"
+      },
+      "opening_hours_sunday": {
+        "name": "Sunday"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {
@@ -28,6 +53,9 @@
           "language": "Language",
           "format": "Date Format",
           "recyclingParkZipCode": "Postal Code (Recycling Park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Set only if different from your address"
         }
       }
     },
