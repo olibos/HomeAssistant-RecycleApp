@@ -26,7 +26,8 @@
         "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening.",
         "data": {
           "language": "Taal",
-          "format": "Datumformaat"
+          "format": "Datumformaat",
+          "recyclingParkZipCode": "Postcode (Recyclagepark)"
         }
       }
     },

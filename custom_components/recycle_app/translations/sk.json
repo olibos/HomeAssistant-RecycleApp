@@ -26,7 +26,8 @@
         "description": "Integrácia aktualizuje všetky informácie o kolekcii pri odoslaní.",
         "data": {
           "language": "Jazyk",
-          "format": "Formát dátumu"
+          "format": "Formát dátumu",
+          "recyclingParkZipCode": "Poštové smerovacie číslo (Recyklačný park)"
         }
       }
     },

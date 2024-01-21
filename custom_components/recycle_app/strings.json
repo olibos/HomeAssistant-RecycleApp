@@ -26,7 +26,8 @@
         "description": "The integration will update all collection information upon submission.",
         "data": {
           "language": "Language",
-          "format": "Date Format"
+          "format": "Date Format",
+          "recyclingParkZipCode": "Postal Code (Recycling Park)"
         }
       }
     },
