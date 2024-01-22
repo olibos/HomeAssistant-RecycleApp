@@ -14,6 +14,9 @@ class FostPlusApi:
     __secret: Optional[str] = None
     __access_token: Optional[str] = None
 
+    def initialize(self) -> None:
+        self.__ensure_initialization()
+
     def __ensure_initialization(self):
         if self.__session:
             return

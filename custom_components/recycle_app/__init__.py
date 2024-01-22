@@ -1,4 +1,5 @@
 """Custom integration to integrate RecycleApp with Home Assistant."""
+import asyncio
 from datetime import date, datetime
 import logging
 
@@ -6,10 +7,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import Config, HomeAssistant, callback
 from homeassistant.helpers.device_registry import (
-    async_get as async_get_device_registry,
     DeviceEntryType,
     DeviceInfo,
     async_entries_for_config_entry,
+    async_get as async_get_device_registry,
 )
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -64,6 +65,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             api.get_collections, zip_code_id, street_id, house_number
         )
 
+    async def async_update_parks() -> dict[str, dict]:
+        """Fetch data."""
+        _LOGGER.debug("Update recycling parks")
+        return await hass.async_add_executor_job(
+            api.get_recycling_parks, recycling_park_zip_code, language
+        )
+
     coordinator = DataUpdateCoordinator(
         hass,
         _LOGGER,
@@ -71,19 +79,30 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_method=async_update_collections,
     )
 
-    last_refresh = datetime.now()
+    parks_coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name="RecycleAppGetRecyclingParks",
+        update_method=async_update_parks,
+    )
+
+    last_refresh = datetime.min
     unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
 
     @callback
-    async def async_refresh(now):
+    async def async_refresh():
         nonlocal last_refresh
         if (datetime.now() - last_refresh).total_seconds() > 120:
             last_refresh = datetime.now()
             _LOGGER.debug(f"async_refresh {unique_id}")
-            await coordinator.async_refresh()
+            await asyncio.gather(
+                coordinator.async_refresh(), parks_coordinator.async_refresh()
+            )
 
+    await hass.async_add_executor_job(api.initialize)
     # Fetch initial data so we have data when entities subscribe
-    await coordinator.async_refresh()
+    await async_refresh()
+
     # Refresh every day at midnight
     async_track_time_change(hass, async_refresh, hour=0, minute=0, second=0)
 
@@ -110,7 +129,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         collect_device=device_info,
         collect_coordinator=coordinator,
         unique_id=unique_id,
-        recycling_park_coordinator=coordinator,
+        recycling_park_coordinator=parks_coordinator,
     )
 
     for platform in PLATFORMS:
