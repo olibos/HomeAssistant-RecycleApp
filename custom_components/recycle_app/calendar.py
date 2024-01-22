@@ -6,7 +6,8 @@ from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -16,10 +17,13 @@ from homeassistant.helpers.update_coordinator import (
 from .api import FostPlusApi
 from .const import DOMAIN
 from .info import AppInfo
+from .recycling_park_calendar import RecyclingParkCalendarEntity
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities
+    hass: HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ):
     app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
     fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
@@ -29,19 +33,43 @@ async def async_setup_entry(
     house_number: int = config["houseNumber"]
 
     unique_id = app_info["unique_id"]
-    async_add_entities(
-        [
-            RecycleAppCalendarEntity(
-                coordinator=app_info["collect_coordinator"],
-                zip_code_id=zip_code_id,
-                street_id=street_id,
-                house_number=house_number,
-                unique_id=f"{unique_id}-calendar",
-                device_info=app_info["collect_device"],
-                fractions=fractions,
+    entities = [
+        RecycleAppCalendarEntity(
+            coordinator=app_info["collect_coordinator"],
+            zip_code_id=zip_code_id,
+            street_id=street_id,
+            house_number=house_number,
+            unique_id=f"{unique_id}-calendar",
+            device_info=app_info["collect_device"],
+            fractions=fractions,
+        )
+    ]
+
+    parks: list[str] = config_entry.options.get("parks", [])
+
+    if len(parks) > 0:
+        parks_found = app_info["recycling_park_coordinator"].data
+        for park_id, park_info in parks_found.items():
+            if park_id not in parks:
+                continue
+            device_info = DeviceInfo(
+                entry_type=DeviceEntryType.SERVICE,
+                identifiers={(DOMAIN, f"{unique_id}-{park_id}")},
+                name=park_info["name"],
+                manufacturer="Fost Plus",
+                model="Recycle!",
             )
-        ]
-    )
+
+            entities.append(
+                RecyclingParkCalendarEntity(
+                    app_info["recycling_park_coordinator"],
+                    f"{unique_id}-{park_id}-calendar",
+                    park_id,
+                    device_info,
+                )
+            )
+
+    async_add_entities(entities)
 
 
 class RecycleAppCalendarEntity(
@@ -128,22 +156,20 @@ class RecycleAppCalendarEntity(
             end_date,
         )
 
-        result: list[CalendarEvent] = []
-        for collection_type, dates in collections.items():
-            entity_id = entity_registry.async_get_entity_id(
-                Platform.SENSOR, DOMAIN, base_id + collection_type
+        return [
+            CalendarEvent(
+                start=d,
+                end=d,
+                summary=state.attributes.get(
+                    ATTR_FRIENDLY_NAME, self._fractions[collection_type][1]
+                ),
             )
-            if not entity_id:
-                continue
-
-            state = hass.states.get(entity_id)
-            if not state:
-                continue
-
-            name = state.attributes.get(
-                ATTR_FRIENDLY_NAME, self._fractions[collection_type][1]
+            for collection_type, dates in collections.items()
+            if (
+                entity_id := entity_registry.async_get_entity_id(
+                    Platform.SENSOR, DOMAIN, base_id + collection_type
+                )
             )
-            for d in dates:
-                result.append(CalendarEvent(start=d, end=d, summary=name))
-
-        return result
+            if (state := hass.states.get(entity_id))
+            for d in dates
+        ]

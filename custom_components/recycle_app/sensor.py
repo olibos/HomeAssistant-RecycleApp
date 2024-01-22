@@ -1,6 +1,5 @@
 """RecycleApp sensor."""
 from datetime import date, datetime, timedelta
-import logging
 from typing import Any, final
 
 from homeassistant import config_entries

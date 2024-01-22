@@ -1,6 +1,3 @@
-from datetime import UTC, datetime
-import logging
-
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -8,6 +5,7 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
+from homeassistant.util import dt as dt_util
 
 DAYS_OF_WEEK = [
     "Monday",
@@ -53,13 +51,13 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         ):
             return
 
-        now = datetime.now(tz=UTC)
+        now = dt_util.utcnow()
         day_of_week = (DAYS_OF_WEEK.index(self._day_of_week) + 1) % 7
         periods = []
         for period in self.coordinator.data[self._park_id].get("periods", []):
-            if now < datetime.fromisoformat(
+            if now < dt_util.parse_datetime(
                 period["from"]
-            ) or now > datetime.fromisoformat(period["until"]):
+            ) or now > dt_util.parse_datetime(period["until"]):
                 continue
 
             for opening_day in period["openingDays"]:
