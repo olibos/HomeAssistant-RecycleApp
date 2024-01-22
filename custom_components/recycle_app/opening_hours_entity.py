@@ -1,14 +1,8 @@
-from datetime import date, datetime, timedelta
+from datetime import UTC, datetime
 import logging
 
-from homeassistant import config_entries
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorEntityDescription,
-)
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import translation
+from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -25,16 +19,7 @@ DAYS_OF_WEEK = [
     "Sunday",
 ]
 
-_LOGGER = logging.getLogger(__name__)
 
-
-# file1 = hass.config.path(
-#         "custom_components", "test", "translations", "switch.en.json"
-#     )
-#     file2 = hass.config.path(
-#         "custom_components", "test", "translations", "invalid.json"
-#     )
-#     assert translation.load_translations_files(
 class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
     """Opening hours entity for Recycling Parks."""
 
@@ -58,8 +43,43 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         self._attr_device_info = device_info
         self._day_of_week = day_of_week
         self._park_id = park_id
+        self.__update_native_value()
+
+    def __update_native_value(self) -> None:
+        if (
+            not self.coordinator.last_update_success
+            or self.coordinator.data is None
+            or self._park_id not in self.coordinator.data
+        ):
+            return
+
+        now = datetime.now(tz=UTC)
+        day_of_week = (DAYS_OF_WEEK.index(self._day_of_week) + 1) % 7
+        periods = []
+        for period in self.coordinator.data[self._park_id].get("periods", []):
+            if now < datetime.fromisoformat(
+                period["from"]
+            ) or now > datetime.fromisoformat(period["until"]):
+                continue
+
+            for opening_day in period["openingDays"]:
+                if opening_day["day"] != day_of_week:
+                    continue
+                periods = [
+                    f"{openingHour['from']} - {openingHour['until']}"
+                    for openingHour in opening_day["openingHours"]
+                ]
+                break
+
+        self._attr_native_value = "\n".join(periods) if len(periods) > 0 else None
 
     @property
-    def native_value(self) -> str | None:
-        _LOGGER.info(f"_name_translation_key={self._name_translation_key}")
-        return "TODO: Opening hours"
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return super().available and self.native_value is not None
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self.__update_native_value()
+        super()._handle_coordinator_update()
