@@ -7,8 +7,16 @@
           "zipCode": "PSČ",
           "street": "Názov ulice",
           "streetNumber": "Číslo domu",
-          "language": "Jazyk"
+          "language": "Jazyk",
+          "format": "Formát dátumu",
+          "recyclingParkZipCode": "Poštové smerovacie číslo (Recyklačný park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Nastaviť len vtedy, ak sa líši od vašej adresy"
         }
+      },
+      "parks": {
+        "description": "Vyberte si svoje recyklačné parky"
       }
     },
     "error": {
@@ -55,8 +63,11 @@
           "recyclingParkZipCode": "Poštové smerovacie číslo (Recyklačný park)"
         },
         "data_description": {
-          "recyclingParkZipCode": "Set only if different from your address"
+          "recyclingParkZipCode": "Nastaviť len vtedy, ak sa líši od vašej adresy"
         }
+      },
+      "parks": {
+        "description": "Vyberte si svoje recyklačné parky"
       }
     },
     "error": {

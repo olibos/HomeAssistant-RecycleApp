@@ -7,8 +7,16 @@
           "zipCode": "Postcode",
           "street": "Straatnaam",
           "streetNumber": "Huisnummer",
-          "language": "Taal"
+          "language": "Taal",
+          "format": "Datumformaat",
+          "recyclingParkZipCode": "Postcode (Recyclagepark)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
         }
+      },
+      "parks": {
+        "description": "Selecteer uw recycling parken"
       }
     },
     "error": {
@@ -55,8 +63,11 @@
           "recyclingParkZipCode": "Postcode (Recyclagepark)"
         },
         "data_description": {
-          "recyclingParkZipCode": "Set only if different from your address"
+          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
         }
+      },
+      "parks": {
+        "description": "Selecteer uw recycling parken"
       }
     },
     "error": {

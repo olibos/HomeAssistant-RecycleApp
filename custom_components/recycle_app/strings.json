@@ -7,8 +7,16 @@
           "zipCode": "Postal Code",
           "street": "Streetname",
           "streetNumber": "House number",
-          "language": "Language"
+          "language": "Language",
+          "format": "Date Format",
+          "recyclingParkZipCode": "Postal Code (Recycling Park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Set only if different from your address"
         }
+      },
+      "parks": {
+        "description": "Please select your recycling parks"
       }
     },
     "error": {
@@ -55,8 +63,11 @@
           "recyclingParkZipCode": "Postal Code (Recycling Park)"
         },
         "data_description": {
-          "recyclingParkZipCode": "Set only if different from your address"
+          "recyclingParkZipCode": "Only if different from your postcode"
         }
+      },
+      "parks": {
+        "description": "Please select your recycling parks"
       }
     },
     "error": {

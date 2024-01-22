@@ -7,8 +7,16 @@
           "zipCode": "Code Postal",
           "street": "Rue",
           "streetNumber": "Numéro",
-          "language": "Langue"
+          "language": "Langue",
+          "format": "Format de date",
+          "recyclingParkZipCode": "Code Postal du Recyparc"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Seulement si différent de votre code postal"
         }
+      },
+      "parks": {
+        "description": "Veuillez sélectionner vos parcs de recyclage"
       }
     },
     "error": {
@@ -55,8 +63,11 @@
           "recyclingParkZipCode": "Code Postal du Recyparc"
         },
         "data_description": {
-          "recyclingParkZipCode": "Set only if different from your address"
+          "recyclingParkZipCode": "Seulement si différent de votre code postal"
         }
+      },
+      "parks": {
+        "description": "Veuillez sélectionner vos parcs de recyclage"
       }
     },
     "error": {
