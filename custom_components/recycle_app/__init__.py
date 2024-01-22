@@ -5,7 +5,12 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import Config, HomeAssistant, callback
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.device_registry import (
+    async_get as async_get_device_registry,
+    DeviceEntryType,
+    DeviceInfo,
+    async_entries_for_config_entry,
+)
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -42,12 +47,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     fractions: dict[str, tuple[str, str]] = options.get("fractions")
     language: str = options.get("language", "fr")
     date_format: str = options.get("format", DEFAULT_DATE_FORMAT)
+    recycling_park_zip_code = options.get("recyclingParkZipCode", zip_code_id)
+    parks: list[str] = options.get("parks", [])
     _LOGGER.debug(f"zip_code_id: {zip_code_id}")
     _LOGGER.debug(f"street_id: {street_id}")
     _LOGGER.debug(f"house_number: {house_number}")
     _LOGGER.debug(f"fractions: {fractions}")
     _LOGGER.debug(f"language: {language}")
     _LOGGER.debug(f"format: {date_format}")
+    _LOGGER.debug(f"parks: {parks} [{recycling_park_zip_code}]")
 
     async def async_update_collections() -> dict[str, list[date]]:
         """Fetch data."""
@@ -86,9 +94,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         manufacturer="Fost Plus",
         model="Recycle!",
     )
+    device_registry = async_get_device_registry(hass)
+    for device_entry in async_entries_for_config_entry(device_registry, entry.entry_id):
+        _domain, identifier = list(device_entry.identifiers)[0]
+        if identifier == unique_id:
+            continue
+
+        park_id = identifier.split("-")[-1]
+        if park_id in parks:
+            continue
+
+        device_registry.async_remove_device(device_entry.id)
 
     hass.data[DOMAIN][entry.entry_id] = AppInfo(
-        collect_device=device_info, collect_coordinator=coordinator, unique_id=unique_id
+        collect_device=device_info,
+        collect_coordinator=coordinator,
+        unique_id=unique_id,
+        recycling_park_coordinator=coordinator,
     )
 
     for platform in PLATFORMS:

@@ -121,6 +121,20 @@ class FostPlusApi:
 
         return (result["items"][0]["id"], result["items"][0]["names"][language])
 
+    def get_recycling_parks(self, zip_code_id: str, language: str):
+        result = {}
+        response: dict[str, list[dict]] = self.__get(
+            f"collection-points/recycling-parks?zipcode={zip_code_id}&size=10&language={language}"
+        )
+
+        for item in response.get("items", []):
+            result[item.get("id")] = {
+                "name": item["displayName"][language],
+                "exceptions": item["exceptionDays"],
+                "periods": item["openingPeriods"],
+            }
+        return result
+
     def get_fractions(
         self,
         zip_code_id: str,

@@ -11,4 +11,5 @@ class AppInfo(TypedDict, total=True):
 
     collect_device: DeviceInfo
     collect_coordinator: DataUpdateCoordinator[dict[str, list[date]]]
+    recycling_park_coordinator: DataUpdateCoordinator[dict[str, dict]]
     unique_id: str
