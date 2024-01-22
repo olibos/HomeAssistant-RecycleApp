@@ -61,11 +61,11 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "houseNumber": house_umber,
                     "name": name,
                 }
-                recyclingParkZipCode = info.get("recyclingParkZipCode", None)
-                if recyclingParkZipCode:
+                recycling_park_zip_code = info.get("recyclingParkZipCode", None)
+                if recycling_park_zip_code:
                     zip_code_id = (
                         await self.hass.async_add_executor_job(
-                            api.get_zip_code, recyclingParkZipCode, language
+                            api.get_zip_code, recycling_park_zip_code, language
                         )
                     )[0]
                 self._options = {
@@ -184,11 +184,11 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             fractions = await self.hass.async_add_executor_job(
                 api.get_fractions, zip_code_id, street_id, house_umber, language
             )
-            recyclingParkZipCode = user_input.get("recyclingParkZipCode", None)
-            if recyclingParkZipCode:
+            recycling_park_zip_code = user_input.get("recyclingParkZipCode", None)
+            if recycling_park_zip_code:
                 zip_code_id = (
                     await self.hass.async_add_executor_job(
-                        api.get_zip_code, recyclingParkZipCode, language
+                        api.get_zip_code, recycling_park_zip_code, language
                     )
                 )[0]
             self._parks = await self.hass.async_add_executor_job(
