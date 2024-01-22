@@ -7,8 +7,16 @@
           "zipCode": "PSČ",
           "street": "Názov ulice",
           "streetNumber": "Číslo domu",
-          "language": "Jazyk"
+          "language": "Jazyk",
+          "format": "Formát dátumu",
+          "recyclingParkZipCode": "Poštové smerovacie číslo (Recyklačný park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Nastaviť len vtedy, ak sa líši od vašej adresy"
         }
+      },
+      "parks": {
+        "description": "Vyberte si svoje recyklačné parky"
       }
     },
     "error": {
@@ -20,14 +28,46 @@
       "already_configured": "Táto adresa je už nakonfigurovaná"
     }
   },
+  "entity": {
+    "sensor": {
+      "opening_hours_monday": {
+        "name": "Pondelok"
+      },
+      "opening_hours_tuesday": {
+        "name": "Utorok"
+      },
+      "opening_hours_wednesday": {
+        "name": "Streda"
+      },
+      "opening_hours_thursday": {
+        "name": "Štvrtok"
+      },
+      "opening_hours_friday": {
+        "name": "Piatok"
+      },
+      "opening_hours_saturday": {
+        "name": "Sobota"
+      },
+      "opening_hours_sunday": {
+        "name": "Nedeľa"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {
         "description": "Integrácia aktualizuje všetky informácie o kolekcii pri odoslaní.",
         "data": {
           "language": "Jazyk",
-          "format": "Formát dátumu"
+          "format": "Formát dátumu",
+          "recyclingParkZipCode": "Poštové smerovacie číslo (Recyklačný park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Nastaviť len vtedy, ak sa líši od vašej adresy"
         }
+      },
+      "parks": {
+        "description": "Vyberte si svoje recyklačné parky"
       }
     },
     "error": {

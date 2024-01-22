@@ -1,49 +1,79 @@
 """RecycleApp sensor."""
 from datetime import date, datetime, timedelta
-import logging
 from typing import Any, final
 
 from homeassistant import config_entries
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
 
+from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon
 from .info import AppInfo
-
-_LOGGER = logging.getLogger(__name__)
+from .opening_hours_entity import DAYS_OF_WEEK, OpeningHoursEntity
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities
+    hass: HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ):
     app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
     fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
     unique_id = app_info["unique_id"]
     date_format: str = config_entry.options.get("format", DEFAULT_DATE_FORMAT)
+    language: str = config_entry.options.get("language", "fr")
+    entities = [
+        RecycleAppEntity(
+            app_info["collect_coordinator"],
+            f"{unique_id}-{fraction}",
+            fraction,
+            color,
+            name,
+            app_info["collect_device"],
+            date_format,
+        )
+        for (fraction, (color, name)) in fractions.items()
+    ]
 
-    if isinstance(fractions, dict):
-        async_add_entities(
-            [
-                RecycleAppEntity(
-                    app_info["collect_coordinator"],
-                    f"{unique_id}-{fraction}",
-                    fraction,
-                    color,
-                    name,
-                    app_info["collect_device"],
-                    date_format,
+    recycling_park_zip_code: str = config_entry.options.get(
+        "recyclingParkZipCode", None
+    )
+    parks: list[str] = config_entry.options.get("parks", [])
+
+    if len(parks) > 0 and recycling_park_zip_code:
+        api = FostPlusApi()
+        parks_found = await hass.async_add_executor_job(
+            api.get_recycling_parks, recycling_park_zip_code, language
+        )
+        for park_id, park_info in parks_found.items():
+            if park_id not in parks:
+                continue
+            device_info = DeviceInfo(
+                entry_type=DeviceEntryType.SERVICE,
+                identifiers={(DOMAIN, f"{unique_id}-{park_id}")},
+                name=park_info["name"],
+                manufacturer="Fost Plus",
+                model="Recycle!",
+            )
+
+            entities += [
+                OpeningHoursEntity(
+                    app_info["recycling_park_coordinator"],
+                    f"{unique_id}-{park_id}-{day_of_week}",
+                    park_id,
+                    day_of_week,
+                    device_info,
                 )
-                for (fraction, (color, name)) in fractions.items()
+                for day_of_week in DAYS_OF_WEEK
             ]
-        )
-    else:
-        _LOGGER.error(
-            "Your fractions are in the v1 format... Please delete this address and restart"
-        )
+
+    async_add_entities(entities)
 
 
 class RecycleAppEntity(
@@ -104,13 +134,17 @@ class RecycleAppEntity(
     def native_value(self) -> date | None:
         return (
             self.coordinator.data[self._fraction][0]
-            if self._fraction in self.coordinator.data
+            if self.coordinator.data is not None
+            and self._fraction in self.coordinator.data
             else None
         )
 
     @property
     def available(self) -> bool:
-        return self._fraction in self.coordinator.data
+        return (
+            self.coordinator.data is not None
+            and self._fraction in self.coordinator.data
+        )
 
     @property
     def device_info(self) -> dict:

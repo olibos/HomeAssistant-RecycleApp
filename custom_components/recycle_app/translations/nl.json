@@ -7,8 +7,16 @@
           "zipCode": "Postcode",
           "street": "Straatnaam",
           "streetNumber": "Huisnummer",
-          "language": "Taal"
+          "language": "Taal",
+          "format": "Datumformaat",
+          "recyclingParkZipCode": "Postcode (Recyclagepark)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
         }
+      },
+      "parks": {
+        "description": "Selecteer uw recycling parken"
       }
     },
     "error": {
@@ -20,14 +28,46 @@
       "already_configured": "Dit adres is al geconfigureerd"
     }
   },
+  "entity": {
+    "sensor": {
+      "opening_hours_monday": {
+        "name": "Maandag"
+      },
+      "opening_hours_tuesday": {
+        "name": "Dinsdag"
+      },
+      "opening_hours_wednesday": {
+        "name": "Woensdag"
+      },
+      "opening_hours_thursday": {
+        "name": "Donderdag"
+      },
+      "opening_hours_friday": {
+        "name": "Vrijdag"
+      },
+      "opening_hours_saturday": {
+        "name": "Zaterdag"
+      },
+      "opening_hours_sunday": {
+        "name": "Zondag"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {
         "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening.",
         "data": {
           "language": "Taal",
-          "format": "Datumformaat"
+          "format": "Datumformaat",
+          "recyclingParkZipCode": "Postcode (Recyclagepark)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
         }
+      },
+      "parks": {
+        "description": "Selecteer uw recycling parken"
       }
     },
     "error": {

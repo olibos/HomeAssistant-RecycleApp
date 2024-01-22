@@ -7,8 +7,16 @@
           "zipCode": "Code Postal",
           "street": "Rue",
           "streetNumber": "Numéro",
-          "language": "Langue"
+          "language": "Langue",
+          "format": "Format de date",
+          "recyclingParkZipCode": "Code Postal du Recyparc"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Seulement si différent de votre code postal"
         }
+      },
+      "parks": {
+        "description": "Veuillez sélectionner vos parcs de recyclage"
       }
     },
     "error": {
@@ -20,14 +28,46 @@
       "already_configured": "Cette adresse est déjà configurée"
     }
   },
+  "entity": {
+    "sensor": {
+      "opening_hours_monday": {
+        "name": "Lundi"
+      },
+      "opening_hours_tuesday": {
+        "name": "Mardi"
+      },
+      "opening_hours_wednesday": {
+        "name": "Mercredi"
+      },
+      "opening_hours_thursday": {
+        "name": "Jeudi"
+      },
+      "opening_hours_friday": {
+        "name": "Vendredi"
+      },
+      "opening_hours_saturday": {
+        "name": "Samedi"
+      },
+      "opening_hours_sunday": {
+        "name": "Dimanche"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {
         "description": "L'intégration mettra à jour toutes les informations relatives aux collectes lors de la soumission.",
         "data": {
           "language": "Langue",
-          "format": "Format de date"
+          "format": "Format de date",
+          "recyclingParkZipCode": "Code Postal du Recyparc"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Seulement si différent de votre code postal"
         }
+      },
+      "parks": {
+        "description": "Veuillez sélectionner vos parcs de recyclage"
       }
     },
     "error": {

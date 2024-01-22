@@ -7,8 +7,16 @@
           "zipCode": "Postal Code",
           "street": "Streetname",
           "streetNumber": "House number",
-          "language": "Language"
+          "language": "Language",
+          "format": "Date Format",
+          "recyclingParkZipCode": "Postal Code (Recycling Park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Set only if different from your address"
         }
+      },
+      "parks": {
+        "description": "Please select your recycling parks"
       }
     },
     "error": {
@@ -20,14 +28,46 @@
       "already_configured": "This address is already configured"
     }
   },
+  "entity": {
+    "sensor": {
+      "opening_hours_monday": {
+        "name": "Monday"
+      },
+      "opening_hours_tuesday": {
+        "name": "Tuesday"
+      },
+      "opening_hours_wednesday": {
+        "name": "Wednesday"
+      },
+      "opening_hours_thursday": {
+        "name": "Thursday"
+      },
+      "opening_hours_friday": {
+        "name": "Friday"
+      },
+      "opening_hours_saturday": {
+        "name": "Saturday"
+      },
+      "opening_hours_sunday": {
+        "name": "Sunday"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {
         "description": "The integration will update all collection information upon submission.",
         "data": {
           "language": "Language",
-          "format": "Date Format"
+          "format": "Date Format",
+          "recyclingParkZipCode": "Postal Code (Recycling Park)"
+        },
+        "data_description": {
+          "recyclingParkZipCode": "Only if different from your postcode"
         }
+      },
+      "parks": {
+        "description": "Please select your recycling parks"
       }
     },
     "error": {

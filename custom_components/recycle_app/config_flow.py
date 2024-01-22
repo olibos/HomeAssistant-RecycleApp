@@ -7,6 +7,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowError, FlowResult
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.selector import selector
 
 from .api import FostPlusApi, FostPlusApiException
@@ -16,6 +17,11 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    def __init__(self) -> None:
+        self._data = {}
+        self._options = {}
+        self._parks = {}
+
     @staticmethod
     @callback
     def async_get_options_flow(
@@ -40,6 +46,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     api.get_street, info["street"], zip_code_id, language
                 )
                 house_umber: int = info["streetNumber"]
+                date_format: str = info.get("format", DEFAULT_DATE_FORMAT)
                 fractions = await self.hass.async_add_executor_job(
                     api.get_fractions, zip_code_id, street_id, house_umber, language
                 )
@@ -48,16 +55,38 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 self._abort_if_unique_id_configured()
                 name = f"{house_umber} {street_name}, {zip_code_name}"
-                return self.async_create_entry(
-                    title=name,
-                    data={
-                        "zipCodeId": zip_code_id,
-                        "streetId": street_id,
-                        "houseNumber": house_umber,
-                        "name": name,
-                    },
-                    options={"fractions": fractions, "language": language},
+                self._data = {
+                    "zipCodeId": zip_code_id,
+                    "streetId": street_id,
+                    "houseNumber": house_umber,
+                    "name": name,
+                }
+                recycling_park_zip_code = info.get("recyclingParkZipCode", None)
+                if recycling_park_zip_code:
+                    zip_code_id = (
+                        await self.hass.async_add_executor_job(
+                            api.get_zip_code, recycling_park_zip_code, language
+                        )
+                    )[0]
+                self._options = {
+                    "language": language,
+                    "format": date_format,
+                    "fractions": fractions,
+                    "recyclingParkZipCode": zip_code_id,
+                    "parks": [],
+                }
+                self._parks = await self.hass.async_add_executor_job(
+                    api.get_recycling_parks, zip_code_id, language
                 )
+
+                if len(self._parks) > 0:
+                    return await self.async_step_parks()
+                else:
+                    return self.async_create_entry(
+                        title=name,
+                        data=self._data,
+                        options=self._options,
+                    )
 
             except FostPlusApiException as error:
                 errors["base"] = error.code
@@ -84,16 +113,64 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             }
                         }
                     ),
+                    vol.Required("format", default=DEFAULT_DATE_FORMAT): str,
+                    vol.Optional(
+                        "recyclingParkZipCode",
+                    ): OptionalInt(),
                 }
             ),
             errors=errors,
         )
+
+    async def async_step_parks(self, user_input: Optional[dict[str, Any]] = None):
+        if user_input is not None:
+            _LOGGER.info(f"user_input: {user_input}")
+            self._options["parks"] = user_input["parks"]
+            return self.async_create_entry(
+                title=self._data["name"],
+                data=self._data,
+                options=self._options,
+            )
+
+        parks = list(self._parks.keys())
+
+        return self.async_show_form(
+            step_id="parks",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        "parks",
+                        default=parks,
+                    ): cv.multi_select(
+                        {key: value["name"] for key, value in self._parks.items()}
+                    )
+                }
+            ),
+            last_step=True,
+        )
+
+
+class OptionalInt(vol.Coerce):
+    def __init__(self):
+        super().__init__(int)
+
+    def __call__(self, v: int) -> Optional[int]:
+        """Validate input."""
+        if v:
+            try:
+                return int(v)
+            except ValueError as error:
+                raise vol.Invalid("Not an integer!") from error
+
+        return v
 
 
 class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
+        self._parks = None
+        self._data = None
 
     async def async_step_init(self, user_input: dict[str, Any] = None) -> FlowResult:
         """Manage the options."""
@@ -107,14 +184,31 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             fractions = await self.hass.async_add_executor_job(
                 api.get_fractions, zip_code_id, street_id, house_umber, language
             )
-            return self.async_create_entry(
-                title="",
-                data={
-                    "language": language,
-                    "format": date_format,
-                    "fractions": fractions,
-                },
+            recycling_park_zip_code = user_input.get("recyclingParkZipCode", None)
+            if recycling_park_zip_code:
+                zip_code_id = (
+                    await self.hass.async_add_executor_job(
+                        api.get_zip_code, recycling_park_zip_code, language
+                    )
+                )[0]
+            self._parks = await self.hass.async_add_executor_job(
+                api.get_recycling_parks, zip_code_id, language
             )
+            self._data = {
+                "language": language,
+                "format": date_format,
+                "fractions": fractions,
+                "recyclingParkZipCode": zip_code_id,
+                "parks": [],
+            }
+
+            if len(self._parks) > 0:
+                return await self.async_step_parks()
+            else:
+                return self.async_create_entry(
+                    title="",
+                    data=self._data,
+                )
 
         return self.async_show_form(
             step_id="init",
@@ -137,6 +231,43 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
                             "format", DEFAULT_DATE_FORMAT
                         ),
                     ): str,
+                    vol.Optional(
+                        "recyclingParkZipCode",
+                        default=self.config_entry.options.get(
+                            "recyclingParkZipCode", ""
+                        ).split("-")[0],
+                    ): OptionalInt(),
                 }
             ),
+            last_step=False,
+        )
+
+    async def async_step_parks(self, user_input: dict[str, Any] = None) -> FlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            self._data["parks"] = user_input["parks"]
+            return self.async_create_entry(
+                title="",
+                data=self._data,
+            )
+
+        parks = self.config_entry.options.get("parks", None)
+        if parks:
+            parks = list(set(parks) & set(self._parks.keys()))
+        else:
+            parks = list(self._parks.keys())
+
+        return self.async_show_form(
+            step_id="parks",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        "parks",
+                        default=parks,
+                    ): cv.multi_select(
+                        {key: value["name"] for key, value in self._parks.items()}
+                    )
+                }
+            ),
+            last_step=True,
         )
