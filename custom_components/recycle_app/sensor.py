@@ -18,8 +18,6 @@ from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon
 from .info import AppInfo
 from .opening_hours_entity import DAYS_OF_WEEK, OpeningHoursEntity
 
-_LOGGER = logging.getLogger(__name__)
-
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -137,13 +135,17 @@ class RecycleAppEntity(
     def native_value(self) -> date | None:
         return (
             self.coordinator.data[self._fraction][0]
-            if self._fraction in self.coordinator.data
+            if self.coordinator.data is not None
+            and self._fraction in self.coordinator.data
             else None
         )
 
     @property
     def available(self) -> bool:
-        return self._fraction in self.coordinator.data
+        return (
+            self.coordinator.data is not None
+            and self._fraction in self.coordinator.data
+        )
 
     @property
     def device_info(self) -> dict:

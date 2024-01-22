@@ -77,6 +77,9 @@ class RecycleAppCalendarEntity(
         labels: Optional[list[str]] = None
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = async_get_entity_registry(self.hass)
+        if self.coordinator.data is None:
+            return None
+
         for fraction_id, event_dates in self.coordinator.data.items():
             entity_id = entity_registry.async_get_entity_id(
                 Platform.SENSOR, DOMAIN, base_id + fraction_id
