@@ -2,6 +2,7 @@
 import asyncio
 from datetime import date, datetime
 import logging
+from typing import Optional
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
@@ -90,7 +91,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
 
     @callback
-    async def async_refresh():
+    async def async_refresh(_now: Optional[datetime] = None):
         nonlocal last_refresh
         if (datetime.now() - last_refresh).total_seconds() > 120:
             last_refresh = datetime.now()
