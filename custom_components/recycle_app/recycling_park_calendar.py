@@ -86,7 +86,7 @@ class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
             (
                 event
                 for event in self.__get_events(now, now + timedelta(days=10))
-                if now >= event.start
+                if now < event.end
             ),
             None,
         )
