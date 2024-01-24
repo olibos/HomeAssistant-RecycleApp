@@ -1,14 +1,16 @@
 """RecycleApp Calendar."""
 from datetime import date, datetime
+import logging
 from typing import Optional
 
 from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -18,6 +20,8 @@ from .api import FostPlusApi
 from .const import DOMAIN
 from .info import AppInfo
 from .recycling_park_calendar import RecyclingParkCalendarEntity
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
@@ -97,10 +101,14 @@ class RecycleAppCalendarEntity(
         self._fractions = fractions
         self._attr_unique_id = unique_id
         self._attr_device_info = device_info
+        self._remove_change_listener: Optional[CALLBACK_TYPE] = None
 
     @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
+        if self._remove_change_listener:
+            self._remove_change_listener()
+            self._remove_change_listener = None
         next_collect: date = date.max
         labels: Optional[list[str]] = None
         base_id = self.unique_id.replace("-calendar", "-")
@@ -108,6 +116,7 @@ class RecycleAppCalendarEntity(
         if self.coordinator.data is None:
             return None
 
+        entity_ids: list[str] = []
         for fraction_id, event_dates in self.coordinator.data.items():
             entity_id = entity_registry.async_get_entity_id(
                 Platform.SENSOR, DOMAIN, base_id + fraction_id
@@ -115,6 +124,7 @@ class RecycleAppCalendarEntity(
             if not entity_id:
                 continue
 
+            entity_ids.append(entity_id)
             state = self.hass.states.get(entity_id)
             if not state:
                 continue
@@ -131,15 +141,35 @@ class RecycleAppCalendarEntity(
                 )
             )
 
-        return (
-            CalendarEvent(
-                start=next_collect,
-                end=next_collect,
-                summary=" - ".join(labels),
+        @callback
+        def update(
+            _entity_id: str, _from: Optional[State], _to: Optional[State]
+        ) -> None:
+            """Update state and reschedule next alarms."""
+            _LOGGER.debug("Update %s: tracked dependencies", self.entity_id)
+            self.async_write_ha_state()
+
+        if not labels:
+            self._remove_change_listener = async_track_state_change(
+                self.hass, entity_ids, update
             )
-            if labels
-            else None
+            return None
+
+        return CalendarEvent(
+            start=next_collect,
+            end=next_collect,
+            summary=" - ".join(labels),
         )
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Run when entity will be removed from hass.
+
+        Remove listeners.
+        """
+        super().async_will_remove_from_hass()
+        if self._remove_change_listener:
+            self._remove_change_listener()
+        self._remove_change_listener = None
 
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
