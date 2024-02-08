@@ -1,7 +1,7 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
 autolabeler:
-  - label: 'chore'
+  - label: 'documentation'
     files:
       - '*.md'
     branch:
