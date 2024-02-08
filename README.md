@@ -30,6 +30,21 @@ The formatting is based on [Python date formatting](https://docs.python.org/3/li
 ### Dashboard with next pickups
 With [entity-filter](https://www.home-assistant.io/dashboards/entity-filter/):
 ![entity-filter](docs/images/entity-filter.png)
+```yaml
+
+type: entity-filter
+entities:
+  - sensor.pmc
+  - sensor.papier
+  - sensor.dechets_non_recyclables_sac
+  - sensor.dechets_biodegradables
+state_filter:
+  - operator: <=
+    value: 1
+    attribute: days
+card:
+  type: entities
+```
 
 ### Templates
 ![templates](docs/images/templates.png)
