@@ -186,20 +186,23 @@ class RecycleAppCalendarEntity(
             end_date,
         )
 
-        return [
-            CalendarEvent(
-                start=d,
-                end=d,
-                summary=state.attributes.get(
-                    ATTR_FRIENDLY_NAME, self._fractions[collection_type][1]
-                ),
-            )
-            for collection_type, dates in collections.items()
-            if (
-                entity_id := entity_registry.async_get_entity_id(
-                    Platform.SENSOR, DOMAIN, base_id + collection_type
+        return sorted(
+            [
+                CalendarEvent(
+                    start=d,
+                    end=d,
+                    summary=state.attributes.get(
+                        ATTR_FRIENDLY_NAME, self._fractions[collection_type][1]
+                    ),
                 )
-            )
-            if (state := hass.states.get(entity_id))
-            for d in dates
-        ]
+                for collection_type, dates in collections.items()
+                if (
+                    entity_id := entity_registry.async_get_entity_id(
+                        Platform.SENSOR, DOMAIN, base_id + collection_type
+                    )
+                )
+                if (state := hass.states.get(entity_id))
+                for d in dates
+            ],
+            key=lambda e: e.start,
+        )
