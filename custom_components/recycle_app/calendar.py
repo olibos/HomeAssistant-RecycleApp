@@ -186,7 +186,7 @@ class RecycleAppCalendarEntity(
             end_date,
         )
 
-        return [
+        events = [
             CalendarEvent(
                 start=d,
                 end=d,
@@ -203,3 +203,5 @@ class RecycleAppCalendarEntity(
             if (state := hass.states.get(entity_id))
             for d in dates
         ]
+
+        return sorted(events, key=lambda e: e.start)

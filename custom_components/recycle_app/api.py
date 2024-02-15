@@ -1,5 +1,6 @@
 """FostPlus API."""
 from array import array
+from collections import defaultdict
 from datetime import date, datetime, timedelta
 import re
 from typing import Optional
@@ -180,7 +181,7 @@ class FostPlusApi:
             from_date = datetime.now()
         if not until_date:
             until_date = from_date + timedelta(weeks=8)
-        result: dict[str, list[date]] = {}
+        result: dict[str, list[date]] = defaultdict(list)
         EMPTY_DICT = {}
         collections: array[dict] = self.__get(
             f'collections?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&fromDate={from_date.strftime("%Y-%m-%d")}&untilDate={until_date.strftime("%Y-%m-%d")}&size={size}'
@@ -201,8 +202,9 @@ class FostPlusApi:
                 continue
 
             collection_date = date(int(parts[0]), int(parts[1]), int(parts[2]))
-            result.setdefault(fraction_id, [])
-            result[fraction_id].append(collection_date)
+            fraction = result[fraction_id]
+            if collection_date not in fraction:
+                fraction.append(collection_date)
 
         return result
 
