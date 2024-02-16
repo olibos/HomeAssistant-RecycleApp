@@ -3,7 +3,11 @@ from datetime import date, datetime, timedelta
 from typing import Any, final
 
 from homeassistant import config_entries
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -93,33 +97,21 @@ class RecycleAppEntity(
     ):
         """Initialize the entity."""
         super().__init__(coordinator)
-        self._unique_id = unique_id
+        is_timestamp = date_format == "TIMESTAMP"
+        self.entity_description = SensorEntityDescription(
+            key="RecycleAppEntity",
+            name=name,
+            icon="mdi:trash-can",
+            device_class=SensorDeviceClass.TIMESTAMP
+            if is_timestamp
+            else SensorDeviceClass.DATE,
+        )
+        self._attr_unique_id = unique_id
         self._fraction = fraction
-        self._image = get_icon(fraction, color)
-        self._name = name
-        self._device_info = device_info
+        self._attr_entity_picture = get_icon(fraction, color)
+        self._attr_device_info = device_info
         self._attr_extra_state_attributes = {"days": None}
-        self._date_format = date_format
-
-    @property
-    def device_class(self):
-        return SensorDeviceClass.DATE
-
-    @property
-    def unique_id(self) -> str:
-        return self._unique_id
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def icon(self) -> str:
-        return "mdi:trash-can"
-
-    @property
-    def entity_picture(self):
-        return self._image
+        self._date_format = date_format if not is_timestamp else DEFAULT_DATE_FORMAT
 
     @property
     @final
@@ -145,10 +137,6 @@ class RecycleAppEntity(
             self.coordinator.data is not None
             and self._fraction in self.coordinator.data
         )
-
-    @property
-    def device_info(self) -> dict:
-        return self._device_info
 
     @callback
     def async_write_ha_state(self) -> None:
