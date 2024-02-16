@@ -25,6 +25,8 @@ You can customize the format in the `configure` of the device:
 
 The formatting is based on [Python date formatting](https://docs.python.org/3/library/datetime.html#format-codes).
 
+You can also set the `Date Format` as `TIMESTAMP` to display relative dates, such as "in 2 days" or "next week". This option uses Home Assistant's built-in timestamp formatting and localization features.
+
 ## Usage Samples
 
 ### Dashboard with next pickups
