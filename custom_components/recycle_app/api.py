@@ -128,7 +128,7 @@ class FostPlusApi:
     def get_recycling_parks(self, zip_code_id: str, language: str):
         result = {}
         response: dict[str, list[dict]] = self.__get(
-            f"collection-points/recycling-parks?zipcode={zip_code_id}&size=10&language={language}"
+            f"collection-points/recycling-parks?zipcode={zip_code_id}&size=100&language={language}"
         )
 
         for item in response.get("items", []):
