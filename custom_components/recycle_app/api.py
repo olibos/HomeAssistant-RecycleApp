@@ -5,7 +5,7 @@ from datetime import date, datetime, timedelta
 import re
 from typing import Optional
 
-from custom_components.recycle_app.const import COLLECTION_TYPES
+from .const import COLLECTION_TYPES
 from requests import Session
 
 
