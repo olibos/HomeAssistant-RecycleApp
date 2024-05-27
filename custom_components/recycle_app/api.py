@@ -33,7 +33,7 @@ class FostPlusApi:
         )
 
         base_url = self.__session.get(
-            "https://recycleapp.be/config/app.settings.json"
+            "https://www.recycleapp.be/config/app.settings.json"
         ).json()["API"]
         self.__endpoint = f"{base_url}/app/v1"
 
