@@ -1,16 +1,22 @@
 """RecycleApp Calendar."""
+
 from datetime import date, datetime
 import logging
-from typing import Optional
 
 from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, State, callback
+from homeassistant.core import (
+    CALLBACK_TYPE,
+    Event,
+    EventStateChangedData,
+    HomeAssistant,
+    callback,
+)
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
-from homeassistant.helpers.event import async_track_state_change
+from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -101,7 +107,7 @@ class RecycleAppCalendarEntity(
         self._fractions = fractions
         self._attr_unique_id = unique_id
         self._attr_device_info = device_info
-        self._remove_change_listener: Optional[CALLBACK_TYPE] = None
+        self._remove_change_listener: CALLBACK_TYPE | None = None
 
     @property
     def event(self) -> CalendarEvent | None:
@@ -110,7 +116,7 @@ class RecycleAppCalendarEntity(
             self._remove_change_listener()
             self._remove_change_listener = None
         next_collect: date = date.max
-        labels: Optional[list[str]] = None
+        labels: list[str] | None = None
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = async_get_entity_registry(self.hass)
         if self.coordinator.data is None:
@@ -142,15 +148,13 @@ class RecycleAppCalendarEntity(
             )
 
         @callback
-        def update(
-            _entity_id: str, _from: Optional[State], _to: Optional[State]
-        ) -> None:
+        def update(_event: Event[EventStateChangedData]) -> None:
             """Update state and reschedule next alarms."""
             _LOGGER.debug("Update %s: tracked dependencies", self.entity_id)
             self.async_write_ha_state()
 
         if not labels:
-            self._remove_change_listener = async_track_state_change(
+            self._remove_change_listener = async_track_state_change_event(
                 self.hass, entity_ids, update
             )
             return None
