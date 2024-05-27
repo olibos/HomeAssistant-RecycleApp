@@ -170,7 +170,7 @@ class RecycleAppCalendarEntity(
 
         Remove listeners.
         """
-        super().async_will_remove_from_hass()
+        await super().async_will_remove_from_hass()
         if self._remove_change_listener:
             self._remove_change_listener()
         self._remove_change_listener = None
