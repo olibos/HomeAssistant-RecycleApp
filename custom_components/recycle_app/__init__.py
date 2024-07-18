@@ -1,18 +1,14 @@
 """Custom integration to integrate RecycleApp with Home Assistant."""
+
 import asyncio
 from datetime import date, datetime
 import logging
-from typing import Optional
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import Config, HomeAssistant, callback
-from homeassistant.helpers.device_registry import (
-    DeviceEntryType,
-    DeviceInfo,
-    async_entries_for_config_entry,
-    async_get as async_get_device_registry,
-)
+import homeassistant.helpers.device_registry as dr
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -20,7 +16,7 @@ from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN
 from .info import AppInfo
 
-PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
+PLATFORMS = [Platform.CALENDAR, Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -49,15 +45,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     fractions: dict[str, tuple[str, str]] = options.get("fractions")
     language: str = options.get("language", "fr")
     date_format: str = options.get("format", DEFAULT_DATE_FORMAT)
-    recycling_park_zip_code = options.get("recyclingParkZipCode", zip_code_id)
+    recycling_park_zip_code: str = options.get("recyclingParkZipCode", zip_code_id)
     parks: list[str] = options.get("parks", [])
-    _LOGGER.debug(f"zip_code_id: {zip_code_id}")
-    _LOGGER.debug(f"street_id: {street_id}")
-    _LOGGER.debug(f"house_number: {house_number}")
-    _LOGGER.debug(f"fractions: {fractions}")
-    _LOGGER.debug(f"language: {language}")
-    _LOGGER.debug(f"format: {date_format}")
-    _LOGGER.debug(f"parks: {parks} [{recycling_park_zip_code}]")
+    _LOGGER.debug("zip_code_id: %s", zip_code_id)
+    _LOGGER.debug("street_id: %s", street_id)
+    _LOGGER.debug("house_number: %d", house_number)
+    _LOGGER.debug("fractions: %r", fractions)
+    _LOGGER.debug("language: %s", language)
+    _LOGGER.debug("format: %s", date_format)
+    _LOGGER.debug("parks: %r [%s]", parks, recycling_park_zip_code)
 
     async def async_update_collections() -> dict[str, list[date]]:
         """Fetch data."""
@@ -91,11 +87,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
 
     @callback
-    async def async_refresh(_now: Optional[datetime] = None):
+    async def async_refresh(_now: datetime | None = None):
         nonlocal last_refresh
         if (datetime.now() - last_refresh).total_seconds() > 120:
             last_refresh = datetime.now()
-            _LOGGER.debug(f"async_refresh {unique_id}")
+            _LOGGER.debug("async_refresh %s", unique_id)
             await asyncio.gather(
                 coordinator.async_refresh(), parks_coordinator.async_refresh()
             )
@@ -114,8 +110,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         manufacturer="Fost Plus",
         model="Recycle!",
     )
-    device_registry = async_get_device_registry(hass)
-    for device_entry in async_entries_for_config_entry(device_registry, entry.entry_id):
+    device_registry = dr.async_get(hass)
+    for device_entry in dr.async_entries_for_config_entry(
+        device_registry, entry.entry_id
+    ):
         _domain, identifier = list(device_entry.identifiers)[0]
         if identifier == unique_id:
             continue
@@ -139,4 +137,5 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

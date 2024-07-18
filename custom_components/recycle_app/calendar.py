@@ -15,7 +15,7 @@ from homeassistant.core import (
 )
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -118,7 +118,7 @@ class RecycleAppCalendarEntity(
         next_collect: date = date.max
         labels: list[str] | None = None
         base_id = self.unique_id.replace("-calendar", "-")
-        entity_registry = async_get_entity_registry(self.hass)
+        entity_registry = er.async_get(self.hass)
         if self.coordinator.data is None:
             return None
 
@@ -180,7 +180,7 @@ class RecycleAppCalendarEntity(
     ) -> list[CalendarEvent]:
         api = FostPlusApi()
         base_id = self.unique_id.replace("-calendar", "-")
-        entity_registry = async_get_entity_registry(hass)
+        entity_registry = er.async_get(hass)
         collections: dict[str, list[date]] = await self.hass.async_add_executor_job(
             api.get_collections,
             self._zip_code_id,

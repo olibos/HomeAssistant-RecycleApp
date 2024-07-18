@@ -1,4 +1,5 @@
 """RecycleApp Calendar."""
+
 from datetime import datetime, timedelta
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
@@ -92,6 +93,7 @@ class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
         )
 
     async def async_get_events(
-        self, hass: HomeAssistant, start_date: datetime, end_date: datetime
+        self, _: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
+        """Return all events between start_date and end_date."""
         return list(self.__get_events(start_date, end_date))

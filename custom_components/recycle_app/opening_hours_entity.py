@@ -1,3 +1,5 @@
+"""Opening hours."""
+
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -28,7 +30,7 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         park_id: str,
         day_of_week: str,
         device_info: DeviceInfo,
-    ):
+    ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
         self.entity_description = SensorEntityDescription(
