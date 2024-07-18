@@ -1,4 +1,5 @@
 """RecycleApp sensor."""
+
 from datetime import date, datetime, timedelta
 from typing import Any, final
 
@@ -92,9 +93,9 @@ class RecycleAppEntity(
         fraction: str,
         color: str,
         name: str,
-        device_info: dict[str, Any] = None,
+        device_info: dict[str, Any] | None = None,
         date_format=DEFAULT_DATE_FORMAT,
-    ):
+    ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
         is_timestamp = date_format == "TIMESTAMP"

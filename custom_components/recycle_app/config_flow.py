@@ -1,6 +1,7 @@
 """RecycleApp ConfigFlow definitions."""
+
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import voluptuous as vol
 
@@ -33,7 +34,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, *_):
         return await self.async_step_setup()
 
-    async def async_step_setup(self, info: Optional[dict[str, Any]] = None):
+    async def async_step_setup(self, info: dict[str, Any] | None = None):
         errors: dict[str, str] = {}
         if info is not None:
             try:
@@ -81,21 +82,21 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
                 if len(self._parks) > 0:
                     return await self.async_step_parks()
-                else:
-                    return self.async_create_entry(
-                        title=name,
-                        data=self._data,
-                        options=self._options,
-                    )
+
+                return self.async_create_entry(
+                    title=name,
+                    data=self._data,
+                    options=self._options,
+                )
 
             except FostPlusApiException as error:
                 errors["base"] = error.code
 
-            except FlowError as flow_error:
-                raise flow_error
+            except FlowError:
+                raise
 
             except Exception as error:
-                _LOGGER.error(f"Failed to register {error}")
+                _LOGGER.error("Failed to register %r", error)
                 errors["base"] = "register_failed"
 
         return self.async_show_form(
@@ -122,9 +123,9 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_parks(self, user_input: Optional[dict[str, Any]] = None):
+    async def async_step_parks(self, user_input: dict[str, Any] | None = None):
         if user_input is not None:
-            _LOGGER.info(f"user_input: {user_input}")
+            _LOGGER.debug("user_input: %r", user_input)
             self._options["parks"] = user_input["parks"]
             return self.async_create_entry(
                 title=self._data["name"],
@@ -151,10 +152,10 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionalInt(vol.Coerce):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(int)
 
-    def __call__(self, v: int) -> Optional[int]:
+    def __call__(self, v: int) -> int | None:
         """Validate input."""
         if v:
             try:
@@ -172,7 +173,9 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
         self._parks = None
         self._data = None
 
-    async def async_step_init(self, user_input: dict[str, Any] = None) -> FlowResult:
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
             api = FostPlusApi()
@@ -204,11 +207,11 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
 
             if len(self._parks) > 0:
                 return await self.async_step_parks()
-            else:
-                return self.async_create_entry(
-                    title="",
-                    data=self._data,
-                )
+
+            return self.async_create_entry(
+                title="",
+                data=self._data,
+            )
 
         return self.async_show_form(
             step_id="init",
@@ -242,7 +245,9 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             last_step=False,
         )
 
-    async def async_step_parks(self, user_input: dict[str, Any] = None) -> FlowResult:
+    async def async_step_parks(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
             self._data["parks"] = user_input["parks"]

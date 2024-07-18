@@ -1,19 +1,20 @@
 """FostPlus API."""
+
 from array import array
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 import re
-from typing import Optional
+
+from requests import Session
 
 from .const import COLLECTION_TYPES
-from requests import Session
 
 
 class FostPlusApi:
-    __session: Optional[Session] = None
+    __session: Session | None = None
     __endpoint: str
-    __secret: Optional[str] = None
-    __access_token: Optional[str] = None
+    __secret: str | None = None
+    __access_token: str | None = None
 
     def initialize(self) -> None:
         self.__ensure_initialization()
@@ -173,8 +174,8 @@ class FostPlusApi:
         zip_code_id: str,
         street_id: str,
         house_number: int,
-        from_date: date = None,
-        until_date: date = None,
+        from_date: date | None = None,
+        until_date: date | None = None,
         size=100,
     ) -> dict[str, list[date]]:
         if not from_date:
