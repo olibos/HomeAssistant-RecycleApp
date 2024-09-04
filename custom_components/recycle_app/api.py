@@ -3,7 +3,6 @@
 from array import array
 from collections import defaultdict
 from datetime import date, datetime, timedelta
-import re
 
 from requests import Session
 
@@ -13,8 +12,6 @@ from .const import COLLECTION_TYPES
 class FostPlusApi:
     __session: Session | None = None
     __endpoint: str
-    __secret: str | None = None
-    __access_token: str | None = None
 
     def initialize(self) -> None:
         self.__ensure_initialization()
@@ -36,68 +33,23 @@ class FostPlusApi:
         base_url = self.__session.get(
             "https://www.recycleapp.be/config/app.settings.json"
         ).json()["API"]
-        self.__endpoint = f"{base_url}/app/v1"
-
-    def __get_secret(self) -> str:
-        self.__ensure_initialization()
-        html = self.__session.get("https://www.recycleapp.be/").text
-        script_url = next(
-            re.finditer(
-                r"src=\"([a-zA-Z0-9/_-]{1,50}main\.[a-f0-9]{8}\.chunk\.js)\"", html
-            )
-        ).group(1)
-        script = self.__session.get("https://www.recycleapp.be/" + script_url).text
-        return next(re.finditer(r"\"(\w{200,})\"", script)).group(1)
-
-    def __get_access_token(self) -> str:
-        self.__ensure_initialization()
-        for _ in range(2):
-            response = self.__session.get(
-                f"{self.__endpoint}/access-token", headers={"x-secret": self.secret}
-            )
-            if response.status_code == 200:
-                return response.json()["accessToken"]
-            if response.status_code == 401:
-                FostPlusApi.__secret = None
-
-    @property
-    def secret(self) -> str:
-        if not FostPlusApi.__secret:
-            FostPlusApi.__secret = self.__get_secret()
-        return FostPlusApi.__secret
-
-    @property
-    def access_token(self) -> str:
-        if not FostPlusApi.__access_token:
-            FostPlusApi.__access_token = self.__get_access_token()
-
-        return FostPlusApi.__access_token
+        self.__endpoint = f"{base_url}/public/v1"
 
     def __post(self, action: str, data=None):
         self.__ensure_initialization()
         for _ in range(2):
-            headers = {"Authorization": self.access_token}
-            response = self.__session.post(
-                f"{self.__endpoint}/{action}", json=data, headers=headers
-            )
+            response = self.__session.post(f"{self.__endpoint}/{action}", json=data)
             if response.status_code == 200:
                 return response.json()
-
-            if response.status_code == 401:
-                FostPlusApi.__access_token = None
+        return None
 
     def __get(self, action: str):
         self.__ensure_initialization()
         for _ in range(2):
-            headers = {"Authorization": self.access_token}
-            response = self.__session.get(
-                f"{self.__endpoint}/{action}", headers=headers
-            )
+            response = self.__session.get(f"{self.__endpoint}/{action}")
             if response.status_code == 200:
                 return response.json()
-
-            if response.status_code == 401:
-                FostPlusApi.__access_token = None
+        return None
 
     def get_zip_code(self, zip_code: int, language: str = "fr") -> tuple[str, str]:
         result = self.__get(f"zipcodes?q={zip_code}")
