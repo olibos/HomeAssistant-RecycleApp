@@ -35,6 +35,18 @@ async def async_setup_entry(
     config_entry: config_entries.ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ):
+    """Set up the RecycleApp Calendar platform.
+
+    This function is called by Home Assistant after the user has created a config entry
+    for the RecycleApp integration.
+
+    The function will create a calendar entity for the user's street and house number,
+    and if the user has selected recycling parks in the options, it will create a
+    separate calendar entity for each of those parks.
+
+    The function will also add the calendar entity to the list of entities to be
+    tracked by Home Assistant.
+    """
     app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
     fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
     config = config_entry.data
@@ -100,6 +112,18 @@ class RecycleAppCalendarEntity(
         fractions: dict[str, tuple[str, str]],
         device_info: DeviceInfo,
     ) -> None:
+        """Initialize a Calendar entity.
+
+        Args:
+            coordinator: The coordinator for this entity
+            zip_code_id: The zip code id
+            street_id: The street id
+            house_number: The house number
+            unique_id: A unique id for this entity
+            fractions: A dictionary mapping fraction keys to tuples of (fraction name, fraction id)
+            device_info: The device info for this entity
+
+        """
         super().__init__(coordinator)
         self._zip_code_id = zip_code_id
         self._street_id = street_id
@@ -138,7 +162,7 @@ class RecycleAppCalendarEntity(
             if event_dates[0] > next_collect:
                 continue
 
-            elif event_dates[0] < next_collect:
+            if event_dates[0] < next_collect:
                 labels = []
                 next_collect = event_dates[0]
             labels.append(
@@ -178,6 +202,10 @@ class RecycleAppCalendarEntity(
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
+        """Return calendar events within a datetime range.
+
+        This is only called when opening the calendar in the UI.
+        """
         api = FostPlusApi()
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = er.async_get(hass)
