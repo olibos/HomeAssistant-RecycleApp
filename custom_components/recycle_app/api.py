@@ -10,7 +10,15 @@ from .const import COLLECTION_TYPES
 
 
 class FostPlusApi:
-    """FostPlus API client."""
+    """FostPlus API client for interacting with the RecycleApp.be API.
+
+    This client provides methods to fetch recycling information including:
+    - Zip code and street validation
+    - Recycling park locations and schedules
+    - Collection fractions and dates
+
+    The client automatically handles endpoint discovery via the app settings.
+    """
 
     __session: Session | None = None
     __endpoint: str
