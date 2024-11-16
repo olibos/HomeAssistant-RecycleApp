@@ -10,10 +10,24 @@ from .const import COLLECTION_TYPES
 
 
 class FostPlusApi:
+    """FostPlus API client for interacting with the RecycleApp.be API.
+
+    This client provides methods to fetch recycling information including:
+    - Zip code and street validation
+    - Recycling park locations and schedules
+    - Collection fractions and dates
+
+    The client automatically handles endpoint discovery via the app settings.
+    """
+
     __session: Session | None = None
     __endpoint: str
 
     def initialize(self) -> None:
+        """Ensure the API client is initialized.
+
+        This method is idempotent.
+        """
         self.__ensure_initialization()
 
     def __ensure_initialization(self):
@@ -52,6 +66,19 @@ class FostPlusApi:
         return None
 
     def get_zip_code(self, zip_code: int, language: str = "fr") -> tuple[str, str]:
+        """Get a zip code details.
+
+        Args:
+            zip_code: The zip code (int).
+            language: The user language (str, default "fr").
+
+        Returns:
+            A tuple of (id, name) where id is the unique id of the zip code and name is the name of the zip code in the given language.
+
+        Raises:
+            FostPlusApiException: When the zip code is not found.
+
+        """
         result = self.__get(f"zipcodes?q={zip_code}")
         if result["total"] != 1:
             raise FostPlusApiException("invalid_zipcode")
@@ -61,6 +88,20 @@ class FostPlusApi:
     def get_street(
         self, street: str, zip_code_id: str, language: str = "fr"
     ) -> tuple[str, str]:
+        """Get a street details.
+
+        Args:
+            street: The street name (str).
+            zip_code_id: The zip code id (str).
+            language: The user language (str, default "fr").
+
+        Returns:
+            A tuple of (id, name) where id is the unique id of the street and name is the name of the street in the given language.
+
+        Raises:
+            FostPlusApiException: When the street is not found.
+
+        """
         street = street.strip().lower()
         result = self.__post(f"streets?q={street}&zipcodes={zip_code_id}")
         if result["total"] != 1:
@@ -79,6 +120,19 @@ class FostPlusApi:
         return (result["items"][0]["id"], result["items"][0]["names"][language])
 
     def get_recycling_parks(self, zip_code_id: str, language: str):
+        """Get the recycling parks for the given zip code id.
+
+        Args:
+            zip_code_id: The zip code id (str).
+            language: The user language (str).
+
+        Returns:
+            A dictionary where the key is the unique id of the recycling park and the value is a dictionary with the following keys:
+                - name: The name of the recycling park in the given language.
+                - exceptions: A list of exceptions.
+                - periods: A list of periods.
+
+        """
         result = {}
         response: dict[str, list[dict]] = self.__get(
             f"collection-points/recycling-parks?zipcode={zip_code_id}&size=100&language={language}"
@@ -100,6 +154,21 @@ class FostPlusApi:
         language: str,
         size: int = 100,
     ) -> dict[str, tuple[str, str]]:
+        """Get the collection fractions for the specified address.
+
+        Args:
+            zip_code_id: The zip code id (str) of the address.
+            street_id: The street id (str) of the address.
+            house_number: The house number (int) of the address.
+            language: The user language (str) for the fraction names.
+            size: The number of items per page (int), default is 100.
+
+        Returns:
+            A dictionary where the key is the unique id of the fraction's logo and
+            the value is a tuple containing the fraction's color and name in the
+            specified language.
+
+        """
         this_year = datetime.now().year
         items = []
         page = 1
@@ -130,6 +199,21 @@ class FostPlusApi:
         until_date: date | None = None,
         size=100,
     ) -> dict[str, list[date]]:
+        """Get a dictionary where the key is the fraction id and the value is a list of dates on which the fraction is collected.
+
+        Args:
+            zip_code_id: The id of the zip code (str).
+            street_id: The id of the street (str).
+            house_number: The house number (int) of the address.
+            from_date: The start date of the period (date), default is the current date.
+            until_date: The end date of the period (date), default is 8 weeks from the current date.
+            size: The number of items per page (int), default is 100.
+
+        Returns:
+            A dictionary where the key is the fraction id and the value is a list
+            of dates on which the fraction is collected.
+
+        """
         if not from_date:
             from_date = datetime.now()
         if not until_date:
@@ -163,9 +247,24 @@ class FostPlusApi:
 
 
 class FostPlusApiException(Exception):
-    def __init__(self, code: str) -> None:
+    """Base class for all FostPlus API related exceptions.
+
+    Error Codes:
+    - invalid_zipcode: The provided zip code was not found or had multiple matches
+    - invalid_streetname: The provided street name was not found
+    """
+
+    def __init__(self: "FostPlusApiException", code: str) -> None:
+        """Initialize FostPlus API exception.
+
+        Args:
+            code: The code of the exception (str).
+                 See class docstring for possible values.
+
+        """
         self.__code = code
 
     @property
-    def code(self) -> str:
+    def code(self: "FostPlusApiException") -> str:
+        """Return the code of the exception."""
         return self.__code
