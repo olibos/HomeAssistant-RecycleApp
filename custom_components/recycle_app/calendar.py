@@ -46,6 +46,17 @@ async def async_setup_entry(
 
     The function will also add the calendar entity to the list of entities to be
     tracked by Home Assistant.
+
+    Args:
+        hass: The Home Assistant instance.
+        config_entry: The config entry containing the user configuration.
+        async_add_entities: Callback to add new entities to Home Assistant.
+
+    Returns:
+        None
+
+    Raises:
+        ConfigEntryNotReady: If required data is not yet available.
     """
     app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
     fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
