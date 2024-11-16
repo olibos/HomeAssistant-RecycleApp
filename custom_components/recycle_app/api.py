@@ -247,7 +247,6 @@ class FostPlusApi:
 
 
 class FostPlusApiException(Exception):
-class FostPlusApiException(Exception):
     """Base class for all FostPlus API related exceptions.
 
     Error Codes:
@@ -261,11 +260,11 @@ class FostPlusApiException(Exception):
         Args:
             code: The code of the exception (str).
                  See class docstring for possible values.
+
         """
         self.__code = code
 
     @property
     def code(self: "FostPlusApiException") -> str:
         """Return the code of the exception."""
-        return self.__code
         return self.__code

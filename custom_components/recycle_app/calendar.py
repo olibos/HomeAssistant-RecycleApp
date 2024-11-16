@@ -57,6 +57,7 @@ async def async_setup_entry(
 
     Raises:
         ConfigEntryNotReady: If required data is not yet available.
+
     """
     app_info: AppInfo = hass.data[DOMAIN][config_entry.entry_id]
     fractions: dict[str, tuple[str, str]] = config_entry.options.get("fractions")
@@ -225,6 +226,7 @@ class RecycleAppCalendarEntity(
         Returns:
             list[CalendarEvent]: A list of calendar events within the specified date range,
                 sorted by start date.
+
         """
         api = FostPlusApi()
         base_id = self.unique_id.replace("-calendar", "-")
