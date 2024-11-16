@@ -21,6 +21,12 @@ PLATFORMS = [Platform.CALENDAR, Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
 
 
+def _get_next_retry(interval: timedelta | None) -> timedelta:
+    new_interval = interval * 2 if interval else timedelta(minutes=5)
+    max_interval = timedelta(hours=1)
+    return min(new_interval, max_interval)
+
+
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
     await hass.config_entries.async_reload(entry.entry_id)
@@ -59,29 +65,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_update_collections() -> dict[str, list[date]]:
         """Fetch data."""
         _LOGGER.debug("Update collections")
-        retry = coordinator.update_interval
+        retry = _get_next_retry(coordinator.update_interval)
         try:
             coordinator.update_interval = None
             return await hass.async_add_executor_job(
                 api.get_collections, zip_code_id, street_id, house_number
             )
         except Exception as exception:
-            coordinator.update_interval = retry * 2 if retry else timedelta(minutes=5)
+            coordinator.update_interval = retry
             raise UpdateFailed from exception
 
     async def async_update_parks() -> dict[str, dict]:
         """Fetch data."""
         _LOGGER.debug("Update recycling parks")
-        retry = parks_coordinator.update_interval
+        retry = _get_next_retry(parks_coordinator.update_interval)
         try:
             parks_coordinator.update_interval = None
             return await hass.async_add_executor_job(
                 api.get_recycling_parks, recycling_park_zip_code, language
             )
         except Exception as exception:
-            parks_coordinator.update_interval = (
-                retry * 2 if retry else timedelta(minutes=5)
-            )
+            parks_coordinator.update_interval = retry
             raise UpdateFailed from exception
 
     coordinator = DataUpdateCoordinator(
