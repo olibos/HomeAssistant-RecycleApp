@@ -205,6 +205,15 @@ class RecycleAppCalendarEntity(
         """Return calendar events within a datetime range.
 
         This is only called when opening the calendar in the UI.
+
+        Args:
+            hass: The Home Assistant instance.
+            start_date: The start of the datetime range to fetch events for.
+            end_date: The end of the datetime range to fetch events for.
+
+        Returns:
+            list[CalendarEvent]: A list of calendar events within the specified date range,
+                sorted by start date.
         """
         api = FostPlusApi()
         base_id = self.unique_id.replace("-calendar", "-")
