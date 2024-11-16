@@ -1,7 +1,7 @@
 """Custom integration to integrate RecycleApp with Home Assistant."""
 
 import asyncio
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import logging
 
 from homeassistant.config_entries import ConfigEntry
@@ -11,7 +11,7 @@ import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN
@@ -19,6 +19,12 @@ from .info import AppInfo
 
 PLATFORMS = [Platform.CALENDAR, Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
+
+
+def _get_next_retry(interval: timedelta | None) -> timedelta:
+    new_interval = interval * 2 if interval else timedelta(minutes=5)
+    max_interval = timedelta(hours=1)
+    return min(new_interval, max_interval)
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -59,16 +65,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_update_collections() -> dict[str, list[date]]:
         """Fetch data."""
         _LOGGER.debug("Update collections")
-        return await hass.async_add_executor_job(
-            api.get_collections, zip_code_id, street_id, house_number
-        )
+        retry = _get_next_retry(coordinator.update_interval)
+        try:
+            coordinator.update_interval = None
+            return await hass.async_add_executor_job(
+                api.get_collections, zip_code_id, street_id, house_number
+            )
+        except Exception as exception:
+            coordinator.update_interval = retry
+            raise UpdateFailed from exception
 
     async def async_update_parks() -> dict[str, dict]:
         """Fetch data."""
         _LOGGER.debug("Update recycling parks")
-        return await hass.async_add_executor_job(
-            api.get_recycling_parks, recycling_park_zip_code, language
-        )
+        retry = _get_next_retry(parks_coordinator.update_interval)
+        try:
+            parks_coordinator.update_interval = None
+            return await hass.async_add_executor_job(
+                api.get_recycling_parks, recycling_park_zip_code, language
+            )
+        except Exception as exception:
+            parks_coordinator.update_interval = retry
+            raise UpdateFailed from exception
 
     coordinator = DataUpdateCoordinator(
         hass,
