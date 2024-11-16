@@ -247,18 +247,25 @@ class FostPlusApi:
 
 
 class FostPlusApiException(Exception):
-    """Base class for all FostPlus API related exceptions."""
+class FostPlusApiException(Exception):
+    """Base class for all FostPlus API related exceptions.
 
-    def __init__(self, code: str) -> None:
+    Error Codes:
+    - invalid_zipcode: The provided zip code was not found or had multiple matches
+    - invalid_streetname: The provided street name was not found
+    """
+
+    def __init__(self: "FostPlusApiException", code: str) -> None:
         """Initialize FostPlus API exception.
 
         Args:
             code: The code of the exception (str).
-
+                 See class docstring for possible values.
         """
         self.__code = code
 
     @property
-    def code(self) -> str:
+    def code(self: "FostPlusApiException") -> str:
         """Return the code of the exception."""
+        return self.__code
         return self.__code
