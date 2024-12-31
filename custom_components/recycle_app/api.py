@@ -84,6 +84,9 @@ class FostPlusApi:
         page = 1
         while True:
             response = self.__get(f"{action}&page={page}&size={size}")
+            if not response or "items" not in response or "pages" not in response:
+                break
+
             items += response["items"]
             page += 1
             if page > response["pages"]:
