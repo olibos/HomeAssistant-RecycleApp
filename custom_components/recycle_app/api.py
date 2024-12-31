@@ -65,6 +65,32 @@ class FostPlusApi:
                 return response.json()
         return None
 
+    def __load_all(self, action: str, size: int = 100):
+        """Load all items from a paginated API endpoint.
+
+        This method retrieves all items from a paginated API endpoint by making
+        repeated requests until all pages have been fetched.
+
+        Args:
+            action (str): The API action or endpoint to call.
+            size (int, optional): The number of items to retrieve per page. Defaults to 100.
+
+        Returns:
+            list: A list of all items retrieved from the API.
+
+        """
+
+        items = []
+        page = 1
+        while True:
+            response = self.__get(f"{action}&page={page}&size={size}")
+            items += response["items"]
+            page += 1
+            if page > response["pages"]:
+                break
+
+        return items
+
     def get_zip_code(self, zip_code: int, language: str = "fr") -> tuple[str, str]:
         """Get a zip code details.
 
@@ -169,17 +195,14 @@ class FostPlusApi:
             specified language.
 
         """
-        this_year = datetime.now().year
-        items = []
-        page = 1
-        while True:
-            response = self.__get(
-                f"collections?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&fromDate={this_year}-01-01&untilDate={this_year}-12-31&page={page}&size={size}"
-            )
-            items += response["items"]
-            page += 1
-            if page > response["pages"]:
-                break
+        now = datetime.now()
+        start_year = now.year if now.month >= 6 else now.year - 1
+
+        items = self.__load_all(
+            f"collections?zipcodeId={zip_code_id}&streetId={street_id}&houseNumber={house_number}&fromDate={start_year}-01-01&untilDate={start_year+1}-12-31",
+            size,
+        )
+
         return {
             f["fraction"]["logo"]["id"]: (
                 f["fraction"]["color"],
