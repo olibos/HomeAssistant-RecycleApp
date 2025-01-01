@@ -15,8 +15,17 @@
           "recyclingParkZipCode": "Seulement si différent de votre code postal"
         }
       },
+      "zip_codes": {
+        "description": "Veuillez sélectionner votre code postal",
+        "data": {
+          "zip_code": "Code Postal"
+        }
+      },
       "parks": {
-        "description": "Veuillez sélectionner vos parcs de recyclage"
+        "description": "Veuillez sélectionner vos parcs de recyclage",
+        "data": {
+          "park": "Parcs de Recyclage"
+        }
       }
     },
     "error": {

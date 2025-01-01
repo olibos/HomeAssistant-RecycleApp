@@ -15,8 +15,17 @@
           "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
         }
       },
+      "zip_codes": {
+        "description": "Selecteer uw postcode",
+        "data": {
+          "zip_code": "Postcode"
+        }
+      },
       "parks": {
-        "description": "Selecteer uw recycling parken"
+        "description": "Selecteer uw recycling parken",
+        "data": {
+          "park": "Recycling parken"
+        }
       }
     },
     "error": {
