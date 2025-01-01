@@ -21,7 +21,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RecycleApp."""
 
     def __init__(self) -> None:
-        """Initialize the options flow handler."""
+        """Initialize the config flow handler."""
         self._data = {}
         self._options = {}
         self._parks = {}
@@ -113,20 +113,20 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 street_id, street_name = await self.hass.async_add_executor_job(
                     api.get_street, info["street"], zip_code_id, language
                 )
-                house_umber: int = info["streetNumber"]
+                house_number: int = info["streetNumber"]
                 date_format: str = info.get("format", DEFAULT_DATE_FORMAT)
                 fractions = await self.hass.async_add_executor_job(
-                    api.get_fractions, zip_code_id, street_id, house_umber, language
+                    api.get_fractions, zip_code_id, street_id, house_number, language
                 )
                 await self.async_set_unique_id(
-                    f"RecycleApp-{zip_code_id}-{street_id}-{house_umber}"
+                    f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
                 )
                 self._abort_if_unique_id_configured()
-                name = f"{house_umber} {street_name}, {zip_code_name}"
+                name = f"{house_number} {street_name}, {zip_code_name}"
                 self._data = {
                     "zipCodeId": zip_code_id,
                     "streetId": street_id,
-                    "houseNumber": house_umber,
+                    "houseNumber": house_number,
                     "name": name,
                 }
                 recycling_park_zip_code = info.get("recyclingParkZipCode", None)

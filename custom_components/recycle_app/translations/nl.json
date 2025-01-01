@@ -9,7 +9,7 @@
           "streetNumber": "Huisnummer",
           "language": "Taal",
           "format": "Datumformaat",
-          "recyclingParkZipCode": "Postcode (Recyclagepark)"
+          "recyclingParkZipCode": "Postcode (Recycling park)"
         },
         "data_description": {
           "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
@@ -69,7 +69,7 @@
         "data": {
           "language": "Taal",
           "format": "Datumformaat",
-          "recyclingParkZipCode": "Postcode (Recyclagepark)"
+          "recyclingParkZipCode": "Postcode (Recycling park)"
         },
         "data_description": {
           "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
