@@ -15,8 +15,17 @@
           "recyclingParkZipCode": "Set only if different from your address"
         }
       },
+      "zip_codes": {
+        "description": "Please select your postal code",
+        "data": {
+          "zip_code": "Postal Code"
+        }
+      },
       "parks": {
-        "description": "Please select your recycling parks"
+        "description": "Please select your recycling parks",
+        "data": {
+          "park": "Recycling Parks"
+        }
       }
     },
     "error": {

@@ -15,8 +15,17 @@
           "recyclingParkZipCode": "Nastaviť len vtedy, ak sa líši od vašej adresy"
         }
       },
+      "zip_codes": {
+        "description": "Vyberte si poštové smerovacie číslo",
+        "data": {
+          "zip_code": "PSČ"
+        }
+      },
       "parks": {
-        "description": "Vyberte si svoje recyklačné parky"
+        "description": "Vyberte si svoje recyklačné parky",
+        "data": {
+          "park": "Recyklačné Parky"
+        }
       }
     },
     "error": {

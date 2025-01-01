@@ -94,7 +94,9 @@ class FostPlusApi:
 
         return items
 
-    def get_zip_code(self, zip_code: int, language: str = "fr") -> tuple[str, str]:
+    def get_zip_code(
+        self, zip_code: int, language: str = "fr"
+    ) -> list[tuple[str, str]]:
         """Get a zip code details.
 
         Args:
@@ -109,10 +111,11 @@ class FostPlusApi:
 
         """
         result = self.__get(f"zipcodes?q={zip_code}")
-        if result["total"] != 1:
-            raise FostPlusApiException("invalid_zipcode")
-        item = result["items"][0]
-        return (item["id"], f'{item["code"]} - {item["names"][0][language]}')
+        return [
+            (item["id"], f'{item["code"]} - {name[language]}')
+            for item in result["items"]
+            for name in item["names"]
+        ]
 
     def get_street(
         self, street: str, zip_code_id: str, language: str = "fr"
