@@ -18,10 +18,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for RecycleApp."""
+
     def __init__(self) -> None:
+        """Initialize the config flow handler."""
         self._data = {}
         self._options = {}
         self._parks = {}
+        self._zip_codes = []
+        self._saved_steps = []
 
     @staticmethod
     @callback
@@ -31,35 +36,97 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Create the options flow."""
         return RecycleAppOptionsFlowHandler(config_entry)
 
-    async def async_step_user(self, *_):
+    async def async_step_user(self, *_) -> FlowResult:
+        """Handle the initial step initiated by the user."""
         return await self.async_step_setup()
 
-    async def async_step_setup(self, info: dict[str, Any] | None = None):
+    async def async_step_zip_codes(
+        self, info: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Handle the step for selecting a zip code.
+
+        This step presents a form to the user with a list of zip codes to choose from.
+        When the user has provided a zip code, it proceeds to the setup step.
+
+        Args:
+            info (dict[str, Any] | None): The information provided by the user,
+                                          containing the selected zip code index.
+
+        Returns:
+            FlowResult: The result of the flow, either showing the form again or
+                        proceeding to the setup step with the selected zip code.
+
+        """
+
+        errors: dict[str, str] = {}
+
+        if info is not None:
+            index = int(info["zip_code"])
+            zip_code = self._zip_codes[index]
+            return await self.async_step_setup(self._saved_steps.pop(), zip_code)
+
+        return self.async_show_form(
+            step_id="zip_codes",
+            data_schema=vol.Schema(
+                {
+                    vol.Required("zip_code"): selector(
+                        {
+                            "select": {
+                                "options": [
+                                    {"label": label, "value": str(idx)}
+                                    for idx, (_, label) in enumerate(self._zip_codes)
+                                ],
+                                "mode": "list",
+                            }
+                        }
+                    )
+                }
+            ),
+            last_step=False,
+            errors=errors,
+        )
+
+    async def async_step_setup(
+        self,
+        info: dict[str, Any] | None = None,
+        selected_zip_code: tuple[str, str] | None = None,
+    ) -> FlowResult:
+        """Handle the setup step."""
         errors: dict[str, str] = {}
         if info is not None:
             try:
                 api = FostPlusApi()
                 language: str = info["language"]
-                zip_code_id, zip_code_name = await self.hass.async_add_executor_job(
-                    api.get_zip_code, info["zipCode"], language
+                zip_codes = (
+                    await self.hass.async_add_executor_job(
+                        api.get_zip_code, info["zipCode"], language
+                    )
+                    if selected_zip_code is None
+                    else [selected_zip_code]
                 )
+                if len(zip_codes) > 1:
+                    self._saved_steps.append(info)
+                    self._zip_codes = zip_codes
+                    return await self.async_step_zip_codes()
+
+                zip_code_id, zip_code_name = zip_codes[0]
                 street_id, street_name = await self.hass.async_add_executor_job(
                     api.get_street, info["street"], zip_code_id, language
                 )
-                house_umber: int = info["streetNumber"]
+                house_number: int = info["streetNumber"]
                 date_format: str = info.get("format", DEFAULT_DATE_FORMAT)
                 fractions = await self.hass.async_add_executor_job(
-                    api.get_fractions, zip_code_id, street_id, house_umber, language
+                    api.get_fractions, zip_code_id, street_id, house_number, language
                 )
                 await self.async_set_unique_id(
-                    f"RecycleApp-{zip_code_id}-{street_id}-{house_umber}"
+                    f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
                 )
                 self._abort_if_unique_id_configured()
-                name = f"{house_umber} {street_name}, {zip_code_name}"
+                name = f"{house_number} {street_name}, {zip_code_name}"
                 self._data = {
                     "zipCodeId": zip_code_id,
                     "streetId": street_id,
-                    "houseNumber": house_umber,
+                    "houseNumber": house_number,
                     "name": name,
                 }
                 recycling_park_zip_code = info.get("recyclingParkZipCode", None)
@@ -124,6 +191,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_parks(self, user_input: dict[str, Any] | None = None):
+        """Handle the parks step."""
         if user_input is not None:
             _LOGGER.debug("user_input: %r", user_input)
             self._options["parks"] = user_input["parks"]
@@ -152,7 +220,10 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionalInt(vol.Coerce):
+    """Optional integer validator."""
+
     def __init__(self) -> None:
+        """Initialize the options flow handler."""
         super().__init__(int)
 
     def __call__(self, v: int) -> int | None:
@@ -167,6 +238,8 @@ class OptionalInt(vol.Coerce):
 
 
 class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle the options flow for RecycleApp."""
+
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
