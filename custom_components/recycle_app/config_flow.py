@@ -242,7 +242,6 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
         self._parks = None
         self._data = None
 
