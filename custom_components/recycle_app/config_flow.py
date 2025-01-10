@@ -309,8 +309,8 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
                     ): str,
                     vol.Optional(
                         "recyclingParkZipCode",
-                        default=self.config_entry.options.get(
-                            "recyclingParkZipCode", ""
+                        default=str(
+                            self.config_entry.options.get("recyclingParkZipCode", [""])[0]
                         ).split("-")[0],
                     ): OptionalInt(),
                 }
