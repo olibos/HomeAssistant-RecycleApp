@@ -43,16 +43,19 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     version = config_entry.version
     options = config_entry.options
     data = config_entry.data
+    _LOGGER.debug("Migrating from version %s", version)
     if version < 2:
         recycling_park_zip_code = options.get("recyclingParkZipCode")
 
         # Fix invalid recyclingParkZipCode if needed
         if isinstance(recycling_park_zip_code, list):
+            _LOGGER.debug("Converting recyclingParkZipCode from list to single value")
             options = {**options, "recyclingParkZipCode": recycling_park_zip_code[0]}
 
         hass.config_entries.async_update_entry(
             config_entry, data=data, options=options, version=2
         )
+        _LOGGER.debug("Migration to version 2 completed")
 
     return True
 
