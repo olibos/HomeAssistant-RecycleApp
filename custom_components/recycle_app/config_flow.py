@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RecycleApp."""
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         """Initialize the config flow handler."""
