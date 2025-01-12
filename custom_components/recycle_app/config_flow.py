@@ -289,9 +289,7 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
         self.initial_data = {
             "language": self.config_entry.options.get("language", "fr"),
             "format": self.config_entry.options.get("format", DEFAULT_DATE_FORMAT),
-            "recyclingParkZipCode": str(
-                next(iter(self.config_entry.options.get("recyclingParkZipCode", [])), "")
-            ).partition("-")[0],
+            "recyclingParkZipCode": str(self.config_entry.options.get("recyclingParkZipCode", "")).partition("-")[0],
             "entity_id_prefix": self.config_entry.options.get("entity_id_prefix", ""),
         }
         
