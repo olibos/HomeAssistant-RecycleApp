@@ -66,7 +66,7 @@
   },
   "options": {
     "error": {
-      "unknown": "Unknown error"
+      "unknown": "Erreur inconnue"
     },
     "step": {
       "init": {

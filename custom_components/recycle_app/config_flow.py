@@ -20,6 +20,8 @@ _LOGGER = logging.getLogger(__name__)
 class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RecycleApp."""
 
+    VERSION = 2
+
     def __init__(self) -> None:
         """Initialize the config flow handler."""
         self._data = {}
@@ -319,7 +321,7 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Optional(
                         "entity_id_prefix",
                         default=self.config_entry.options.get("entity_id_prefix", ""),
-                    ): bool,
+                    ): str,
                 }
             ),
             last_step=False,
