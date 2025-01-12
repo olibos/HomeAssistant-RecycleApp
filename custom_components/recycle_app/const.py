@@ -5,6 +5,7 @@ from typing import Final
 
 DOMAIN: Final = "recycle_app"
 MANUFACTURER: Final = "Fost Plus"
+WEBSITE: Final = "https://www.recycleapp.be/"
 
 COLLECTION_TYPES: Final = {
     # Biodegradable waste

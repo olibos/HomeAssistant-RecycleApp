@@ -18,7 +18,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import FostPlusApi
-from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER
+from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER, WEBSITE
 from .info import AppInfo
 from .opening_hours_entity import DAYS_OF_WEEK, OpeningHoursEntity
 
@@ -65,6 +65,7 @@ async def async_setup_entry(
                 name=park_info["name"],
                 manufacturer=MANUFACTURER,
                 model="Recycling park",
+                configuration_url=WEBSITE,
             )
 
             entities += [

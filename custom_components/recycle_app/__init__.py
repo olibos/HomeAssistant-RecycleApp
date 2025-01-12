@@ -14,7 +14,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import FostPlusApi
-from .const import DEFAULT_DATE_FORMAT, DOMAIN, MANUFACTURER
+from .const import DEFAULT_DATE_FORMAT, DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
 
 PLATFORMS = [Platform.CALENDAR, Platform.SENSOR]
@@ -150,6 +150,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         name=config.get("name", "Collecte des poubelles"),
         manufacturer=MANUFACTURER,
         model="Waste collection",
+        configuration_url=WEBSITE,
     )
     device_registry = dr.async_get(hass)
     for device_entry in dr.async_entries_for_config_entry(
