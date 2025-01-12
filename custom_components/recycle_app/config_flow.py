@@ -20,6 +20,8 @@ _LOGGER = logging.getLogger(__name__)
 class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RecycleApp."""
 
+    VERSION = 2
+
     def __init__(self) -> None:
         """Initialize the config flow handler."""
         self._data = {}
@@ -31,10 +33,10 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(
-        config_entry: config_entries.ConfigEntry,
+        _: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
         """Create the options flow."""
-        return RecycleAppOptionsFlowHandler(config_entry)
+        return RecycleAppOptionsFlowHandler()
 
     async def async_step_user(self, *_) -> FlowResult:
         """Handle the initial step initiated by the user."""
@@ -131,7 +133,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
                 recycling_park_zip_code = info.get("recyclingParkZipCode", None)
                 if recycling_park_zip_code:
-                    zip_code_id = (
+                    zip_code_id, _ = (
                         await self.hass.async_add_executor_job(
                             api.get_zip_code, recycling_park_zip_code, language
                         )
@@ -240,9 +242,8 @@ class OptionalInt(vol.Coerce):
 class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle the options flow for RecycleApp."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+    def __init__(self) -> None:
         """Initialize options flow."""
-        self.config_entry = config_entry
         self._parks = None
         self._data = None
 
@@ -262,7 +263,7 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             )
             recycling_park_zip_code = user_input.get("recyclingParkZipCode", None)
             if recycling_park_zip_code:
-                zip_code_id = (
+                zip_code_id, _ = (
                     await self.hass.async_add_executor_job(
                         api.get_zip_code, recycling_park_zip_code, language
                     )
