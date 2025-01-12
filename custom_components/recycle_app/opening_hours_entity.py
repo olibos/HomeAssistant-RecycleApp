@@ -47,7 +47,7 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         self._park_id = park_id
         self.__update_native_value()
         if entity_id_prefix:
-            self.entity_id = f"sensor.{slugify(entity_id_prefix + "_" + device_info.get('name') + "_" + day_of_week)}"
+            self.entity_id = f"sensor.{slugify(entity_id_prefix + "_park_" + device_info.get('name') + "_" + day_of_week)}"
 
     def __update_native_value(self) -> None:
         if (
