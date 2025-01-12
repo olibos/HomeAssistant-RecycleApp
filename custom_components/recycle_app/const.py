@@ -4,6 +4,7 @@ from base64 import b64encode
 from typing import Final
 
 DOMAIN: Final = "recycle_app"
+MANUFACTURER: Final = "Fost Plus"
 
 COLLECTION_TYPES: Final = {
     # Biodegradable waste
