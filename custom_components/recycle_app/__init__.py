@@ -42,7 +42,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     """Handle migration of a config entry to the latest version."""
     version = config_entry.version
     options = config_entry.options
-    data = config_entry.data
+    data = dict(config_entry.data)  # Create a mutable copy of data
     _LOGGER.debug("Migrating from version %s", version)
     if version < 2:
         recycling_park_zip_code = options.get("recyclingParkZipCode")
@@ -62,6 +62,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         hass.config_entries.async_update_entry(
             config_entry, data=data, version=3
         )
+        _LOGGER.debug("Migration to version 3 completed")
 
     _LOGGER.info("Migration to version %s successful", config_entry.version)
     return True
@@ -187,19 +188,3 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-
-async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    """Migrate old entry."""
-    current_version = config_entry.version
-    _LOGGER.info("Migrating from version %s", current_version)
-
-    if current_version < 2:
-        new = {**config_entry.data}
-
-        new["entity_id_prefix"] = ""
-
-        hass.config_entries.async_update_entry(config_entry, data=new, version=2)
-
-    _LOGGER.info("Migration to version %s successful", config_entry.version)
-
-    return True
