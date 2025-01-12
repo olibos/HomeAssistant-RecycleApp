@@ -10,6 +10,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 from homeassistant.util import dt as dt_util
+from homeassistant.util import slugify
 
 
 class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
@@ -47,6 +48,9 @@ class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
             else self.device_info["name"]
         )
 
+        location = self.coordinator.data[self._park_id].get("location", "")
+        description = self.coordinator.data[self._park_id].get("description", "")
+
         while current_date <= end_date:
             if dt_util.as_local(current_date).date() in exceptions:
                 current_date += one_day
@@ -68,6 +72,8 @@ class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
                         )
                     ),
                     summary=name,
+                    location=location,
+                    description=description,
                 )
                 for period in self.coordinator.data[self._park_id]["periods"]
                 if current_date >= dt_util.parse_datetime(period["from"])
