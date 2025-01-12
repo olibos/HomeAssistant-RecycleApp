@@ -34,7 +34,7 @@ async def async_setup_entry(
     unique_id = app_info["unique_id"]
     date_format: str = config_entry.options.get("format", DEFAULT_DATE_FORMAT)
     language: str = config_entry.options.get("language", "fr")
-    entity_id_prefix: str = config_entry.options.get("entity_id_prefix", "fr")
+    entity_id_prefix: str = config_entry.options.get("entity_id_prefix", "")
     entities = [
         RecycleAppEntity(
             app_info["collect_coordinator"],
