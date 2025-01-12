@@ -131,7 +131,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
                 recycling_park_zip_code = info.get("recyclingParkZipCode", None)
                 if recycling_park_zip_code:
-                    zip_code_id = (
+                    zip_code_id, _ = (
                         await self.hass.async_add_executor_job(
                             api.get_zip_code, recycling_park_zip_code, language
                         )
@@ -261,7 +261,7 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
             )
             recycling_park_zip_code = user_input.get("recyclingParkZipCode", None)
             if recycling_park_zip_code:
-                zip_code_id = (
+                zip_code_id, _ = (
                     await self.hass.async_add_executor_job(
                         api.get_zip_code, recycling_park_zip_code, language
                     )
