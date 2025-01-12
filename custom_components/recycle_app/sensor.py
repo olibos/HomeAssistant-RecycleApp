@@ -10,13 +10,13 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.util import slugify
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
+from homeassistant.util import slugify
 
 from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon
@@ -44,7 +44,7 @@ async def async_setup_entry(
             name,
             app_info["collect_device"],
             date_format,
-            entity_id_prefix,  # Pass the entity_id_prefix to each entity
+            entity_id_prefix,
         )
         for (fraction, (color, name)) in fractions.items()
     ]
@@ -77,7 +77,7 @@ async def async_setup_entry(
                     park_id,
                     day_of_week,
                     device_info,
-                    entity_id_prefix,  # Pass the entity_id_prefix to each entity
+                    entity_id_prefix,
                 )
                 for day_of_week in DAYS_OF_WEEK
             ]
@@ -108,9 +108,9 @@ class RecycleAppEntity(
             key="RecycleAppEntity",
             name=name,
             icon="mdi:trash-can",
-            device_class=SensorDeviceClass.TIMESTAMP
-            if is_timestamp
-            else SensorDeviceClass.DATE,
+            device_class=(
+                SensorDeviceClass.TIMESTAMP if is_timestamp else SensorDeviceClass.DATE
+            ),
         )
         self._attr_unique_id = unique_id
         self._fraction = fraction

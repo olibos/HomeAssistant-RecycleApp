@@ -8,6 +8,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 from homeassistant.util import dt as dt_util
+from homeassistant.util import slugify
 
 DAYS_OF_WEEK = [
     "Monday",
@@ -30,6 +31,7 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         park_id: str,
         day_of_week: str,
         device_info: DeviceInfo,
+        entity_id_prefix: str = "",
     ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
@@ -44,6 +46,8 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         self._day_of_week = day_of_week
         self._park_id = park_id
         self.__update_native_value()
+        if entity_id_prefix:
+            self.entity_id = f"sensor.{slugify(entity_id_prefix + "_" + device_info.get('name') + "_" + day_of_week)}"
 
     def __update_native_value(self) -> None:
         if (

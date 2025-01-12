@@ -10,6 +10,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 from homeassistant.util import dt as dt_util
+from homeassistant.util import slugify
 
 
 class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
@@ -24,11 +25,16 @@ class RecyclingParkCalendarEntity(CoordinatorEntity, CalendarEntity):
         unique_id: str,
         park_id: str,
         device_info: DeviceInfo,
+        entity_id_prefix: str = "",
     ) -> None:
         super().__init__(coordinator)
         self._park_id = park_id
         self._attr_unique_id = unique_id
         self._attr_device_info = device_info
+        if entity_id_prefix:
+            self.entity_id = (
+                f"calendar.{slugify(entity_id_prefix + "_park_" + device_info.get('name'))}"
+            )
 
     def __get_events(self, start_date: datetime, end_date: datetime):
         if not self.coordinator.last_update_success or self.coordinator.data is None:
