@@ -184,9 +184,16 @@ class FostPlusApi:
                 "exceptions": item["exceptionDays"],
                 "periods": item["openingPeriods"],
                 "coordinates": {"latitude": lat, "longitude": lon},
-                "location": f"{item.get('street', '')} {item.get('houseNumber', '')}, {item.get('zipcode', '')} {item.get('city', '')}",
-                "description": f"{item['info']['rules']['access']['description'].get(language, '')}\n\n" +
-                               f"{item['info']['rules']['specific'].get(language, '')}"
+                "location": " ".join(filter(None, [
+                    item.get('street', ''),
+                    item.get('houseNumber', ''),
+                    item.get('zipcode', ''),
+                    item.get('city', '')
+                ])),
+                "description": "\n\n".join(filter(None, [
+                    item.get('info', {}).get('rules', {}).get('access', {}).get('description', {}).get(language, ''),
+                    item.get('info', {}).get('rules', {}).get('specific', {}).get(language, '')
+                ]))
             }
             
         return result
