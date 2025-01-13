@@ -44,6 +44,8 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         self._attr_unique_id = unique_id
         self._attr_device_info = device_info
         self._day_of_week = day_of_week
+        self._day_of_week_index = (DAYS_OF_WEEK.index(day_of_week) + 1) % 7
+        self._attr_extra_state_attributes = {"day_of_week": self._day_of_week_index or 7}
         self._park_id = park_id
         self.__update_native_value()
         if entity_id_prefix:
@@ -58,7 +60,6 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
             return
 
         now = dt_util.utcnow()
-        day_of_week = (DAYS_OF_WEEK.index(self._day_of_week) + 1) % 7
         periods = []
         for period in self.coordinator.data[self._park_id].get("periods", []):
             if now < dt_util.parse_datetime(
@@ -67,7 +68,7 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
                 continue
 
             for opening_day in period["openingDays"]:
-                if opening_day["day"] != day_of_week:
+                if opening_day["day"] != self._day_of_week_index:
                     continue
                 periods = [
                     f"{openingHour['from']} - {openingHour['until']}"
