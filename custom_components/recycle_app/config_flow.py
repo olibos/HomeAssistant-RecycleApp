@@ -99,6 +99,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 api = FostPlusApi()
                 language: str = info["language"]
+                entity_id_prefix: str = info["entity_id_prefix"]
                 zip_codes = (
                     await self.hass.async_add_executor_job(
                         api.get_zip_code, info["zipCode"], language
@@ -121,7 +122,7 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     api.get_fractions, zip_code_id, street_id, house_number, language
                 )
                 await self.async_set_unique_id(
-                    f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
+                    f"RecycleApp-{entity_id_prefix}-{zip_code_id}-{street_id}-{house_number}"
                 )
                 self._abort_if_unique_id_configured()
                 name = f"{house_number} {street_name}, {zip_code_name}"
