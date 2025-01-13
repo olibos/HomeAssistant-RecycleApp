@@ -43,7 +43,7 @@ class OpeningHoursEntity(CoordinatorEntity, SensorEntity):
         self._attr_device_info = device_info
         self._day_of_week = day_of_week
         self._day_of_week_index = (DAYS_OF_WEEK.index(day_of_week) + 1) % 7
-        self._attr_extra_state_attributes = {"day_of_week": self._day_of_week_index}
+        self._attr_extra_state_attributes = {"day_of_week": self._day_of_week_index or 7}
         self._park_id = park_id
         self.__update_native_value()
 
