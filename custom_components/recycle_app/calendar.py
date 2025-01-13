@@ -23,7 +23,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import FostPlusApi
-from .const import DOMAIN
+from .const import DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
 from .recycling_park_calendar import RecyclingParkCalendarEntity
 
@@ -90,8 +90,9 @@ async def async_setup_entry(
                 entry_type=DeviceEntryType.SERVICE,
                 identifiers={(DOMAIN, f"{unique_id}-{park_id}")},
                 name=park_info["name"],
-                manufacturer="Fost Plus",
-                model="Recycle!",
+                manufacturer=MANUFACTURER,
+                model="Recycling park",
+                configuration_url=WEBSITE,
             )
 
             entities.append(
