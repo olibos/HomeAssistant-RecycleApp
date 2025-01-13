@@ -171,11 +171,31 @@ class FostPlusApi:
         )
 
         for item in response.get("items", []):
+            # Safeguard for coordinates
+            coordinates = item.get("location", {}).get("coordinates", None)
+            if coordinates:
+                # Ensure the coordinates are in a valid format (e.g., a list or tuple with latitude and longitude)
+                lon, lat = coordinates if isinstance(coordinates, (list, tuple)) and len(coordinates) == 2 else (None, None)
+            else:
+                lon, lat = None, None
+
             result[item.get("id")] = {
                 "name": item["displayName"][language],
                 "exceptions": item["exceptionDays"],
                 "periods": item["openingPeriods"],
+                "coordinates": {"latitude": lat, "longitude": lon},
+                "location": " ".join(filter(None, [
+                    item.get('street', ''),
+                    item.get('houseNumber', ''),
+                    item.get('zipcode', ''),
+                    item.get('city', '')
+                ])),
+                "description": "\n\n".join(filter(None, [
+                    item.get('info', {}).get('rules', {}).get('access', {}).get('description', {}).get(language, ''),
+                    item.get('info', {}).get('rules', {}).get('specific', {}).get(language, '')
+                ]))
             }
+            
         return result
 
     def get_fractions(
