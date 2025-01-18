@@ -42,7 +42,7 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     """Handle migration of a config entry to the latest version."""
     version = config_entry.version
     options = config_entry.options
-    data = config_entry.data
+    data = dict(config_entry.data)  # Create a mutable copy of data
     _LOGGER.debug("Migrating from version %s", version)
     if version < 2:
         recycling_park_zip_code = options.get("recyclingParkZipCode")
@@ -55,8 +55,16 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         hass.config_entries.async_update_entry(
             config_entry, data=data, options=options, version=2
         )
-        _LOGGER.debug("Migration to version 2 completed")
+        _LOGGER.info("Migration to version 2 completed")
+    
+    if version < 3:
+        data["entity_id_prefix"] = ""
+        hass.config_entries.async_update_entry(
+            config_entry, data=data, version=3
+        )
+        _LOGGER.info("Migration to version 3 completed")
 
+    _LOGGER.info("Migration to version %s successful", config_entry.version)
     return True
 
 
@@ -76,12 +84,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     date_format: str = options.get("format", DEFAULT_DATE_FORMAT)
     recycling_park_zip_code: str = options.get("recyclingParkZipCode", zip_code_id)
     parks: list[str] = options.get("parks", [])
+    entity_id_prefix: str = options.get("entity_id_prefix", "")
     _LOGGER.debug("zip_code_id: %s", zip_code_id)
     _LOGGER.debug("street_id: %s", street_id)
     _LOGGER.debug("house_number: %d", house_number)
     _LOGGER.debug("fractions: %r", fractions)
     _LOGGER.debug("language: %s", language)
     _LOGGER.debug("format: %s", date_format)
+    _LOGGER.debug("entity_id_prefix: %s", entity_id_prefix)
     _LOGGER.debug("parks: %r [%s]", parks, recycling_park_zip_code)
 
     async def async_update_collections() -> dict[str, list[date]]:
@@ -125,7 +135,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     last_refresh = datetime.min
-    unique_id = f"RecycleApp-{zip_code_id}-{street_id}-{house_number}"
+    unique_id = f"RecycleApp-{entity_id_prefix}-{zip_code_id}-{street_id}-{house_number}"
 
     @callback
     async def async_refresh(_now: datetime | None = None):
@@ -161,9 +171,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             continue
 
         park_id = identifier.split("-")[-1]
-        if park_id in parks:
+        if park_id in parks and unique_id in identifier:
             continue
-
+        _LOGGER.debug(f"Removing device_entry {device_entry}")
         device_registry.async_remove_device(device_entry.id)
 
     hass.data[DOMAIN][entry.entry_id] = AppInfo(

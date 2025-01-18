@@ -1,86 +1,90 @@
 {
   "config": {
-    "step": {
-      "setup": {
-        "description": "Vul je adres in",
-        "data": {
-          "zipCode": "Postcode",
-          "street": "Straatnaam",
-          "streetNumber": "Huisnummer",
-          "language": "Taal",
-          "format": "Datumformaat",
-          "recyclingParkZipCode": "Postcode (Recycling park)"
-        },
-        "data_description": {
-          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
-        }
-      },
-      "zip_codes": {
-        "description": "Selecteer uw postcode",
-        "data": {
-          "zip_code": "Postcode"
-        }
-      },
-      "parks": {
-        "description": "Selecteer uw recycling parken",
-        "data": {
-          "park": "Recycling parken"
-        }
-      }
-    },
-    "error": {
-      "invalid_zipcode": "Geen postcode gevonden",
-      "invalid_streetname": "Geen straten gevonden, controleer de schrijfwijze of zoek naar een straat in jouw buurt",
-      "register_failed": "Fout tijdens initialisatie, probeer het opnieuw"
-    },
     "abort": {
       "already_configured": "Dit adres is al geconfigureerd"
+    },
+    "error": {
+      "invalid_streetname": "Geen straten gevonden, controleer de schrijfwijze of zoek naar een straat in jouw buurt",
+      "invalid_zipcode": "Geen postcode gevonden",
+      "register_failed": "Fout tijdens initialisatie, probeer het opnieuw"
+    },
+    "step": {
+      "parks": {
+        "data": {
+          "park": "Recycling parken"
+        },
+        "description": "Selecteer uw recycling parken"
+      },
+      "setup": {
+        "data": {
+          "entity_id_prefix": "Entity ID prefix (bv recycle_app of recycle_app_thuis)",
+          "format": "Datumformaat",
+          "language": "Taal",
+          "recyclingParkZipCode": "Postcode (Recycling park)",
+          "street": "Straatnaam",
+          "streetNumber": "Huisnummer",
+          "zipCode": "Postcode"
+        },
+        "data_description": {
+          "entity_id_prefix": "Stel in wanneer u wenst dat de entiteitsnamen een prefix hebben. Bijvoorbeeld sensor.recycle_app_pmd in plaats van sensor.pmd",
+          "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
+        },
+        "description": "Vul je adres in"
+      },
+      "zip_codes": {
+        "data": {
+          "zip_code": "Postcode"
+        },
+        "description": "Selecteer uw postcode"
+      }
     }
   },
   "entity": {
     "sensor": {
-      "opening_hours_monday": {
-        "name": "Maandag"
-      },
-      "opening_hours_tuesday": {
-        "name": "Dinsdag"
-      },
-      "opening_hours_wednesday": {
-        "name": "Woensdag"
-      },
-      "opening_hours_thursday": {
-        "name": "Donderdag"
-      },
       "opening_hours_friday": {
         "name": "Vrijdag"
+      },
+      "opening_hours_monday": {
+        "name": "Maandag"
       },
       "opening_hours_saturday": {
         "name": "Zaterdag"
       },
       "opening_hours_sunday": {
         "name": "Zondag"
+      },
+      "opening_hours_thursday": {
+        "name": "Donderdag"
+      },
+      "opening_hours_tuesday": {
+        "name": "Dinsdag"
+      },
+      "opening_hours_wednesday": {
+        "name": "Woensdag"
       }
     }
   },
   "options": {
+    "error": {
+      "unknown": "Unknown error"
+    },
     "step": {
       "init": {
-        "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening.",
         "data": {
-          "language": "Taal",
+          "entity_id_prefix": "Entity ID prefix (bv recycle_app of recycle_app_thuis)",
           "format": "Datumformaat",
+          "language": "Taal",
           "recyclingParkZipCode": "Postcode (Recycling park)"
         },
         "data_description": {
+          "entity_id_prefix": "Stel in wanneer u wenst dat de entiteitsnamen een prefix hebben. Bijvoorbeeld sensor.recycle_app_pmd in plaats van sensor.pmd",
           "recyclingParkZipCode": "Alleen als deze afwijkt van je postcode"
-        }
+        },
+        "description": "De integratie zal alle informatie over afvalinzameling bijwerken op het moment van indiening."
       },
       "parks": {
         "description": "Selecteer uw recycling parken"
       }
-    },
-    "error": {
-      "unknown": "Unknown error"
     }
   }
 }

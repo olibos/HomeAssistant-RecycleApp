@@ -1,86 +1,90 @@
 {
   "config": {
-    "step": {
-      "setup": {
-        "description": "Enter your address",
-        "data": {
-          "zipCode": "Postal Code",
-          "street": "Streetname",
-          "streetNumber": "House number",
-          "language": "Language",
-          "format": "Date Format",
-          "recyclingParkZipCode": "Postal Code (Recycling Park)"
-        },
-        "data_description": {
-          "recyclingParkZipCode": "Set only if different from your address"
-        }
-      },
-      "zip_codes": {
-        "description": "Please select your postal code",
-        "data": {
-          "zip_code": "Postal Code"
-        }
-      },
-      "parks": {
-        "description": "Please select your recycling parks",
-        "data": {
-          "park": "Recycling Parks"
-        }
-      }
-    },
-    "error": {
-      "invalid_zipcode": "Invalid zip code",
-      "invalid_streetname": "Invalid street name",
-      "register_failed": "Failed to register, please try again"
-    },
     "abort": {
       "already_configured": "This address is already configured"
+    },
+    "error": {
+      "invalid_streetname": "Invalid street name",
+      "invalid_zipcode": "Invalid zip code",
+      "register_failed": "Failed to register, please try again"
+    },
+    "step": {
+      "parks": {
+        "data": {
+          "park": "Recycling Parks"
+        },
+        "description": "Please select your recycling parks"
+      },
+      "setup": {
+        "data": {
+          "entity_id_prefix": "Entity ID prefix (e.g. recycle_app of recycle_app_home)",
+          "format": "Date Format",
+          "language": "Language",
+          "recyclingParkZipCode": "Postal Code (Recycling Park)",
+          "street": "Streetname",
+          "streetNumber": "House number",
+          "zipCode": "Postal Code"
+        },
+        "data_description": {
+          "entity_id_prefix": "Set if you would like the entity names being prefixed. E.g. sensor.recycleapp_pmd instead of sensor.pmd",
+          "recyclingParkZipCode": "Set only if different from your address"
+        },
+        "description": "Enter your address"
+      },
+      "zip_codes": {
+        "data": {
+          "zip_code": "Postal Code"
+        },
+        "description": "Please select your postal code"
+      }
     }
   },
   "entity": {
     "sensor": {
-      "opening_hours_monday": {
-        "name": "Monday"
-      },
-      "opening_hours_tuesday": {
-        "name": "Tuesday"
-      },
-      "opening_hours_wednesday": {
-        "name": "Wednesday"
-      },
-      "opening_hours_thursday": {
-        "name": "Thursday"
-      },
       "opening_hours_friday": {
         "name": "Friday"
+      },
+      "opening_hours_monday": {
+        "name": "Monday"
       },
       "opening_hours_saturday": {
         "name": "Saturday"
       },
       "opening_hours_sunday": {
         "name": "Sunday"
+      },
+      "opening_hours_thursday": {
+        "name": "Thursday"
+      },
+      "opening_hours_tuesday": {
+        "name": "Tuesday"
+      },
+      "opening_hours_wednesday": {
+        "name": "Wednesday"
       }
     }
   },
   "options": {
+    "error": {
+      "unknown": "Unknown error"
+    },
     "step": {
       "init": {
-        "description": "The integration will update all collection information upon submission.",
         "data": {
-          "language": "Language",
+          "entity_id_prefix": "Entity ID prefix (e.g. recycle_app of recycle_app_home)",
           "format": "Date Format",
+          "language": "Language",
           "recyclingParkZipCode": "Postal Code (Recycling Park)"
         },
         "data_description": {
+          "entity_id_prefix": "Set if you would like the entity names being prefixed. E.g. sensor.recycleapp_pmd instead of sensor.pmd",
           "recyclingParkZipCode": "Only if different from your postcode"
-        }
+        },
+        "description": "The integration will update all collection information upon submission."
       },
       "parks": {
         "description": "Please select your recycling parks"
       }
-    },
-    "error": {
-      "unknown": "Unknown error"
     }
   }
 }

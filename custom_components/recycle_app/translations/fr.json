@@ -1,86 +1,90 @@
 {
   "config": {
-    "step": {
-      "setup": {
-        "description": "Entrez votre adresse",
-        "data": {
-          "zipCode": "Code Postal",
-          "street": "Rue",
-          "streetNumber": "Numéro",
-          "language": "Langue",
-          "format": "Format de date",
-          "recyclingParkZipCode": "Code Postal du Recyparc"
-        },
-        "data_description": {
-          "recyclingParkZipCode": "Seulement si différent de votre code postal"
-        }
-      },
-      "zip_codes": {
-        "description": "Veuillez sélectionner votre code postal",
-        "data": {
-          "zip_code": "Code Postal"
-        }
-      },
-      "parks": {
-        "description": "Veuillez sélectionner vos parcs de recyclage",
-        "data": {
-          "park": "Parcs de Recyclage"
-        }
-      }
+    "abort": {
+      "already_configured": "Cette adresse est d\u00e9j\u00e0 configur\u00e9e"
     },
     "error": {
-      "invalid_zipcode": "Aucun code postal trouvé",
-      "invalid_streetname": "Aucune rue trouvée, vérifiez l'orthographe ou recherchez une autre rue à proximité",
-      "register_failed": "Erreur lors de l'initialisation, veuillez réessayer"
+      "invalid_streetname": "Aucune rue trouv\u00e9e, v\u00e9rifiez l'orthographe ou recherchez une autre rue \u00e0 proximit\u00e9",
+      "invalid_zipcode": "Aucun code postal trouv\u00e9",
+      "register_failed": "Erreur lors de l'initialisation, veuillez r\u00e9essayer"
     },
-    "abort": {
-      "already_configured": "Cette adresse est déjà configurée"
+    "step": {
+      "parks": {
+        "data": {
+          "park": "Parcs de Recyclage"
+        },
+        "description": "Veuillez s\u00e9lectionner vos parcs de recyclage"
+      },
+      "setup": {
+        "data": {
+          "entity_id_prefix": "Pr\u00e9fixe de l'ID de l'entit\u00e9 (par exemple, recycle_app ou recycle_app_maison)",
+          "format": "Format de date",
+          "language": "Langue",
+          "recyclingParkZipCode": "Code Postal du Recyparc",
+          "street": "Rue",
+          "streetNumber": "Num\u00e9ro",
+          "zipCode": "Code Postal"
+        },
+        "data_description": {
+          "entity_id_prefix": "\u00c0 d\u00e9finir si vous souhaitez que les noms des entit\u00e9s aient un pr\u00e9fixe. Par exemple, sensor.recycleapp_pmd au lieu de sensor.pmd",
+          "recyclingParkZipCode": "Seulement si diff\u00e9rent de votre code postal"
+        },
+        "description": "Entrez votre adresse"
+      },
+      "zip_codes": {
+        "data": {
+          "zip_code": "Code Postal"
+        },
+        "description": "Veuillez s\u00e9lectionner votre code postal"
+      }
     }
   },
   "entity": {
     "sensor": {
-      "opening_hours_monday": {
-        "name": "Lundi"
-      },
-      "opening_hours_tuesday": {
-        "name": "Mardi"
-      },
-      "opening_hours_wednesday": {
-        "name": "Mercredi"
-      },
-      "opening_hours_thursday": {
-        "name": "Jeudi"
-      },
       "opening_hours_friday": {
         "name": "Vendredi"
+      },
+      "opening_hours_monday": {
+        "name": "Lundi"
       },
       "opening_hours_saturday": {
         "name": "Samedi"
       },
       "opening_hours_sunday": {
         "name": "Dimanche"
+      },
+      "opening_hours_thursday": {
+        "name": "Jeudi"
+      },
+      "opening_hours_tuesday": {
+        "name": "Mardi"
+      },
+      "opening_hours_wednesday": {
+        "name": "Mercredi"
       }
     }
   },
   "options": {
+    "error": {
+      "unknown": "Erreur inconnue"
+    },
     "step": {
       "init": {
-        "description": "L'intégration mettra à jour toutes les informations relatives aux collectes lors de la soumission.",
         "data": {
-          "language": "Langue",
+          "entity_id_prefix": "Pr\u00e9fixe de l'ID de l'entit\u00e9 (par exemple, recycle_app ou recycle_app_maison)",
           "format": "Format de date",
+          "language": "Langue",
           "recyclingParkZipCode": "Code Postal du Recyparc"
         },
         "data_description": {
-          "recyclingParkZipCode": "Seulement si différent de votre code postal"
-        }
+          "entity_id_prefix": "\u00c0 d\u00e9finir si vous souhaitez que les noms des entit\u00e9s aient un pr\u00e9fixe. Par exemple, sensor.recycleapp_pmd au lieu de sensor.pmd",
+          "recyclingParkZipCode": "Seulement si diff\u00e9rent de votre code postal"
+        },
+        "description": "L'int\u00e9gration mettra \u00e0 jour toutes les informations relatives aux collectes lors de la soumission."
       },
       "parks": {
-        "description": "Veuillez sélectionner vos parcs de recyclage"
+        "description": "Veuillez s\u00e9lectionner vos parcs de recyclage"
       }
-    },
-    "error": {
-      "unknown": "Unknown error"
     }
   }
 }

@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
+from homeassistant.util import slugify
 
 from .api import FostPlusApi
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER, WEBSITE
@@ -33,6 +34,7 @@ async def async_setup_entry(
     unique_id = app_info["unique_id"]
     date_format: str = config_entry.options.get("format", DEFAULT_DATE_FORMAT)
     language: str = config_entry.options.get("language", "fr")
+    entity_id_prefix: str = config_entry.options.get("entity_id_prefix", "")
     entities = [
         RecycleAppEntity(
             app_info["collect_coordinator"],
@@ -42,6 +44,7 @@ async def async_setup_entry(
             name,
             app_info["collect_device"],
             date_format,
+            entity_id_prefix,
         )
         for (fraction, (color, name)) in fractions.items()
     ]
@@ -75,6 +78,7 @@ async def async_setup_entry(
                     park_id,
                     day_of_week,
                     device_info,
+                    entity_id_prefix,
                 )
                 for day_of_week in DAYS_OF_WEEK
             ]
@@ -96,6 +100,7 @@ class RecycleAppEntity(
         name: str,
         device_info: dict[str, Any] | None = None,
         date_format=DEFAULT_DATE_FORMAT,
+        entity_id_prefix: str = "",  # Default to an empty string
     ) -> None:
         """Initialize the entity."""
         super().__init__(coordinator)
@@ -104,9 +109,9 @@ class RecycleAppEntity(
             key="RecycleAppEntity",
             name=name,
             icon="mdi:trash-can",
-            device_class=SensorDeviceClass.TIMESTAMP
-            if is_timestamp
-            else SensorDeviceClass.DATE,
+            device_class=(
+                SensorDeviceClass.TIMESTAMP if is_timestamp else SensorDeviceClass.DATE
+            ),
         )
         self._attr_unique_id = unique_id
         self._fraction = fraction
@@ -114,6 +119,15 @@ class RecycleAppEntity(
         self._attr_device_info = device_info
         self._attr_extra_state_attributes = {"days": None}
         self._date_format = date_format if not is_timestamp else DEFAULT_DATE_FORMAT
+
+        # Handle entity_id prefix using slugify
+        prefix = (
+            slugify(entity_id_prefix) if entity_id_prefix else ""
+        )  # Slugify the prefix
+        base_name = slugify(name)  # Slugify the base name
+        self.entity_id = (
+            f"sensor.{prefix}_{base_name}" if prefix else f"sensor.{base_name}"
+        )
 
     @property
     @final
