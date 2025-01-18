@@ -1,54 +1,50 @@
 {
   "common": {
-    "day": {
-      "full": {
-        "Friday": "vendredi",
-        "Monday": "lundi",
-        "Saturday": "samedi",
-        "Sunday": "dimanche",
-        "Thursday": "jeudi",
-        "Tuesday": "mardi",
-        "Wednesday": "mercredi"
-      },
-      "short": {
-        "Friday": "ven",
-        "Monday": "lun",
-        "Saturday": "sam",
-        "Sunday": "dim",
-        "Thursday": "jeu",
-        "Tuesday": "mar",
-        "Wednesday": "mer"
-      }
+    "day_full": {
+      "Friday": "vendredi",
+      "Monday": "lundi",
+      "Saturday": "samedi",
+      "Sunday": "dimanche",
+      "Thursday": "jeudi",
+      "Tuesday": "mardi",
+      "Wednesday": "mercredi"
     },
-    "month": {
-      "full": {
-        "April": "avril",
-        "August": "ao\u00fbt",
-        "December": "d\u00e9cembre",
-        "February": "f\u00e9vrier",
-        "January": "janvier",
-        "July": "juillet",
-        "June": "juin",
-        "March": "mars",
-        "May": "mai",
-        "November": "novembre",
-        "October": "octobre",
-        "September": "septembre"
-      },
-      "short": {
-        "April": "avr",
-        "August": "ao\u00fbt",
-        "December": "d\u00e9c",
-        "February": "f\u00e9v",
-        "January": "jan",
-        "July": "juil",
-        "June": "jun",
-        "March": "mar",
-        "May": "mai",
-        "November": "nov",
-        "October": "oct",
-        "September": "sep"
-      }
+    "day_short": {
+      "Friday": "ven",
+      "Monday": "lun",
+      "Saturday": "sam",
+      "Sunday": "dim",
+      "Thursday": "jeu",
+      "Tuesday": "mar",
+      "Wednesday": "mer"
+    },
+    "month_full": {
+      "April": "avril",
+      "August": "ao\u00fbt",
+      "December": "d\u00e9cembre",
+      "February": "f\u00e9vrier",
+      "January": "janvier",
+      "July": "juillet",
+      "June": "juin",
+      "March": "mars",
+      "May": "mai",
+      "November": "novembre",
+      "October": "octobre",
+      "September": "septembre"
+    },
+    "month_short": {
+      "April": "avr",
+      "August": "ao\u00fbt",
+      "December": "d\u00e9c",
+      "February": "f\u00e9v",
+      "January": "jan",
+      "July": "juil",
+      "June": "jun",
+      "March": "mar",
+      "May": "mai",
+      "November": "nov",
+      "October": "oct",
+      "September": "sep"
     }
   },
   "config": {

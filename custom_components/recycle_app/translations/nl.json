@@ -1,54 +1,50 @@
 {
   "common": {
-    "day": {
-      "full": {
-        "Friday": "vrijdag",
-        "Monday": "maandag",
-        "Saturday": "zaterdag",
-        "Sunday": "zondag",
-        "Thursday": "donderdag",
-        "Tuesday": "dinsdag",
-        "Wednesday": "woensdag"
-      },
-      "short": {
-        "Friday": "vr",
-        "Monday": "ma",
-        "Saturday": "za",
-        "Sunday": "zo",
-        "Thursday": "do",
-        "Tuesday": "di",
-        "Wednesday": "wo"
-      }
+    "day_full": {
+      "Friday": "vrijdag",
+      "Monday": "maandag",
+      "Saturday": "zaterdag",
+      "Sunday": "zondag",
+      "Thursday": "donderdag",
+      "Tuesday": "dinsdag",
+      "Wednesday": "woensdag"
     },
-    "month": {
-      "full": {
-        "April": "april",
-        "August": "augustus",
-        "December": "december",
-        "February": "februari",
-        "January": "januari",
-        "July": "juli",
-        "June": "juni",
-        "March": "maart",
-        "May": "mei",
-        "November": "november",
-        "October": "oktober",
-        "September": "september"
-      },
-      "short": {
-        "April": "apr",
-        "August": "aug",
-        "December": "dec",
-        "February": "feb",
-        "January": "jan",
-        "July": "jul",
-        "June": "jun",
-        "March": "mrt",
-        "May": "mei",
-        "November": "nov",
-        "October": "okt",
-        "September": "sep"
-      }
+    "day_short": {
+      "Friday": "vr",
+      "Monday": "ma",
+      "Saturday": "za",
+      "Sunday": "zo",
+      "Thursday": "do",
+      "Tuesday": "di",
+      "Wednesday": "wo"
+    },
+    "month_full": {
+      "April": "april",
+      "August": "augustus",
+      "December": "december",
+      "February": "februari",
+      "January": "januari",
+      "July": "juli",
+      "June": "juni",
+      "March": "maart",
+      "May": "mei",
+      "November": "november",
+      "October": "oktober",
+      "September": "september"
+    },
+    "month_short": {
+      "April": "apr",
+      "August": "aug",
+      "December": "dec",
+      "February": "feb",
+      "January": "jan",
+      "July": "jul",
+      "June": "jun",
+      "March": "mrt",
+      "May": "mei",
+      "November": "nov",
+      "October": "okt",
+      "September": "sep"
     }
   },
   "config": {

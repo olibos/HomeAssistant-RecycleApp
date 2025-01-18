@@ -1,54 +1,50 @@
 {
   "common": {
-    "day": {
-      "full": {
-        "Friday": "piatok",
-        "Monday": "pondelok",
-        "Saturday": "sobota",
-        "Sunday": "nede\u013ea",
-        "Thursday": "\u0161tvrtok",
-        "Tuesday": "utorok",
-        "Wednesday": "streda"
-      },
-      "short": {
-        "Friday": "pi",
-        "Monday": "po",
-        "Saturday": "so",
-        "Sunday": "ne",
-        "Thursday": "\u0161t",
-        "Tuesday": "ut",
-        "Wednesday": "st"
-      }
+    "day_full": {
+      "Friday": "piatok",
+      "Monday": "pondelok",
+      "Saturday": "sobota",
+      "Sunday": "nede\u013ea",
+      "Thursday": "\u0161tvrtok",
+      "Tuesday": "utorok",
+      "Wednesday": "streda"
     },
-    "month": {
-      "full": {
-        "April": "apr\u00edl",
-        "August": "august",
-        "December": "december",
-        "February": "febru\u00e1r",
-        "January": "janu\u00e1r",
-        "July": "j\u00fal",
-        "June": "j\u00fan",
-        "March": "marec",
-        "May": "m\u00e1j",
-        "November": "november",
-        "October": "okt\u00f3ber",
-        "September": "september"
-      },
-      "short": {
-        "April": "apr",
-        "August": "aug",
-        "December": "dec",
-        "February": "feb",
-        "January": "jan",
-        "July": "j\u00fal",
-        "June": "j\u00fan",
-        "March": "mar",
-        "May": "m\u00e1j",
-        "November": "nov",
-        "October": "okt",
-        "September": "sep"
-      }
+    "day_short": {
+      "Friday": "pi",
+      "Monday": "po",
+      "Saturday": "so",
+      "Sunday": "ne",
+      "Thursday": "\u0161t",
+      "Tuesday": "ut",
+      "Wednesday": "st"
+    },
+    "month_full": {
+      "April": "apr\u00edl",
+      "August": "august",
+      "December": "december",
+      "February": "febru\u00e1r",
+      "January": "janu\u00e1r",
+      "July": "j\u00fal",
+      "June": "j\u00fan",
+      "March": "marec",
+      "May": "m\u00e1j",
+      "November": "november",
+      "October": "okt\u00f3ber",
+      "September": "september"
+    },
+    "month_short": {
+      "April": "apr",
+      "August": "aug",
+      "December": "dec",
+      "February": "feb",
+      "January": "jan",
+      "July": "j\u00fal",
+      "June": "j\u00fan",
+      "March": "mar",
+      "May": "m\u00e1j",
+      "November": "nov",
+      "October": "okt",
+      "September": "sep"
     }
   },
   "config": {

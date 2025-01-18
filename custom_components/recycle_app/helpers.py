@@ -15,24 +15,24 @@ async def get_localized_date(
 
     # Extract month and day translations (full and short forms)
     month_full = {
-        key.replace(f"component.{domain}.common.month.full.", ""): value
+        key.replace(f"component.{domain}.common.month_full.", ""): value
         for key, value in translations.items()
-        if key.startswith(f"component.{domain}.common.month.full.")
+        if key.startswith(f"component.{domain}.common.month_full.")
     }
     month_short = {
-        key.replace(f"component.{domain}.common.month.short.", ""): value
+        key.replace(f"component.{domain}.common.month_short.", ""): value
         for key, value in translations.items()
-        if key.startswith(f"component.{domain}.common.month.short.")
+        if key.startswith(f"component.{domain}.common.month_short.")
     }
     day_full = {
-        key.replace(f"component.{domain}.common.day.full.", ""): value
+        key.replace(f"component.{domain}.common.day_full.", ""): value
         for key, value in translations.items()
-        if key.startswith(f"component.{domain}.common.day.full.")
+        if key.startswith(f"component.{domain}.common.day_full.")
     }
     day_short = {
-        key.replace(f"component.{domain}.common.day.short.", ""): value
+        key.replace(f"component.{domain}.common.day_short.", ""): value
         for key, value in translations.items()
-        if key.startswith(f"component.{domain}.common.day.short.")
+        if key.startswith(f"component.{domain}.common.day_short.")
     }
 
     # Mapping of strftime placeholders to localized translations
