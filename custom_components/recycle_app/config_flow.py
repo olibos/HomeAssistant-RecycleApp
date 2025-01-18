@@ -292,38 +292,32 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
                 data=self._data,
             )
 
+        self.initial_data = {
+            "language": self.config_entry.options.get("language", "fr"),
+            "format": self.config_entry.options.get("format", DEFAULT_DATE_FORMAT),
+            "recyclingParkZipCode": str(self.config_entry.options.get("recyclingParkZipCode", "")).partition("-")[0],
+            "entity_id_prefix": self.config_entry.options.get("entity_id_prefix", ""),
+        }
+        
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        "language",
-                        default=self.config_entry.options.get("language", "fr"),
-                    ): selector(
-                        {
-                            "select": {
-                                "options": ["fr", "nl", "en", "de"],
-                                "mode": "dropdown",
+            data_schema=self.add_suggested_values_to_schema(
+                vol.Schema(
+                    {
+                        vol.Required("language"): selector(
+                            {
+                                "select": {
+                                    "options": ["fr", "nl", "en", "de"],
+                                    "mode": "dropdown",
+                                }
                             }
-                        }
-                    ),
-                    vol.Required(
-                        "format",
-                        default=self.config_entry.options.get(
-                            "format", DEFAULT_DATE_FORMAT
                         ),
-                    ): str,
-                    vol.Optional(
-                        "recyclingParkZipCode",
-                        default=self.config_entry.options.get(
-                            "recyclingParkZipCode", ""
-                        ).split("-")[0],
-                    ): OptionalInt(),
-                    vol.Optional(
-                        "entity_id_prefix",
-                        default=self.config_entry.options.get("entity_id_prefix", ""),
-                    ): str,
-                }
+                        vol.Required("format"): str,
+                        vol.Optional("recyclingParkZipCode"): OptionalInt(),
+                        vol.Optional("entity_id_prefix"): str,
+                    }
+                ),
+                self.initial_data,
             ),
             last_step=False,
         )
