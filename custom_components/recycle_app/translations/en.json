@@ -1,4 +1,56 @@
 {
+  "common": {
+    "day": {
+      "full": {
+        "Friday": "Friday",
+        "Monday": "Monday",
+        "Saturday": "Saturday",
+        "Sunday": "Sunday",
+        "Thursday": "Thursday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday"
+      },
+      "short": {
+        "Friday": "Fri",
+        "Monday": "Mon",
+        "Saturday": "Sat",
+        "Sunday": "Sun",
+        "Thursday": "Thu",
+        "Tuesday": "Tue",
+        "Wednesday": "Wed"
+      }
+    },
+    "month": {
+      "full": {
+        "April": "April",
+        "August": "August",
+        "December": "December",
+        "February": "February",
+        "January": "January",
+        "July": "July",
+        "June": "June",
+        "March": "March",
+        "May": "May",
+        "November": "November",
+        "October": "October",
+        "September": "September"
+      },
+      "short": {
+        "April": "Apr",
+        "August": "Aug",
+        "December": "Dec",
+        "February": "Feb",
+        "January": "Jan",
+        "July": "Jul",
+        "June": "Jun",
+        "March": "Mar",
+        "May": "May",
+        "November": "Nov",
+        "October": "Oct",
+        "September": "Sep"
+      }
+    }
+  },
   "config": {
     "abort": {
       "already_configured": "This address is already configured"
@@ -41,6 +93,15 @@
   },
   "entity": {
     "sensor": {
+      "collection_today": {
+        "name": "Collection today"
+      },
+      "collection_tomorrow": {
+        "name": "Collection tomorrow"
+      },
+      "collection_upcoming": {
+        "name": "Next collection"
+      },
       "opening_hours_friday": {
         "name": "Friday"
       },

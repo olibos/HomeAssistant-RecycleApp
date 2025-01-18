@@ -1,4 +1,56 @@
 {
+  "common": {
+    "day": {
+      "full": {
+        "Friday": "piatok",
+        "Monday": "pondelok",
+        "Saturday": "sobota",
+        "Sunday": "nede\u013ea",
+        "Thursday": "\u0161tvrtok",
+        "Tuesday": "utorok",
+        "Wednesday": "streda"
+      },
+      "short": {
+        "Friday": "pi",
+        "Monday": "po",
+        "Saturday": "so",
+        "Sunday": "ne",
+        "Thursday": "\u0161t",
+        "Tuesday": "ut",
+        "Wednesday": "st"
+      }
+    },
+    "month": {
+      "full": {
+        "April": "apr\u00edl",
+        "August": "august",
+        "December": "december",
+        "February": "febru\u00e1r",
+        "January": "janu\u00e1r",
+        "July": "j\u00fal",
+        "June": "j\u00fan",
+        "March": "marec",
+        "May": "m\u00e1j",
+        "November": "november",
+        "October": "okt\u00f3ber",
+        "September": "september"
+      },
+      "short": {
+        "April": "apr",
+        "August": "aug",
+        "December": "dec",
+        "February": "feb",
+        "January": "jan",
+        "July": "j\u00fal",
+        "June": "j\u00fan",
+        "March": "mar",
+        "May": "m\u00e1j",
+        "November": "nov",
+        "October": "okt",
+        "September": "sep"
+      }
+    }
+  },
   "config": {
     "abort": {
       "already_configured": "T\u00e1to adresa je u\u017e nakonfigurovan\u00e1"
@@ -17,7 +69,7 @@
       },
       "setup": {
         "data": {
-          "entity_id_prefix": "Prefix ID entitiy (napr. recycle_app alebo recycle_app_home)",
+          "entity_id_prefix": "Prefix n\u00e1zvu entity (napr. recycle_app alebo recycle_app_home)",
           "format": "Form\u00e1t d\u00e1tumu",
           "language": "Jazyk",
           "recyclingParkZipCode": "Po\u0161tov\u00e9 smerovacie \u010d\u00edslo (Recykla\u010dn\u00fd park)",
@@ -41,6 +93,15 @@
   },
   "entity": {
     "sensor": {
+      "collection_today": {
+        "name": "Zber dnes"
+      },
+      "collection_tomorrow": {
+        "name": "Zber zajtra"
+      },
+      "collection_upcoming": {
+        "name": "Nadch\u00e1dzaj\u00faci zber"
+      },
       "opening_hours_friday": {
         "name": "Piatok"
       },
@@ -71,7 +132,7 @@
     "step": {
       "init": {
         "data": {
-          "entity_id_prefix": "Prefix ID entitiy (napr. recycle_app alebo recycle_app_home)",
+          "entity_id_prefix": "Prefix n\u00e1zvu entity (napr. recycle_app alebo recycle_app_home)",
           "format": "Form\u00e1t d\u00e1tumu",
           "language": "Jazyk",
           "recyclingParkZipCode": "Po\u0161tov\u00e9 smerovacie \u010d\u00edslo (Recykla\u010dn\u00fd park)"
