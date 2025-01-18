@@ -1,8 +1,9 @@
 """RecycleApp Calendar."""
 
-from datetime import date, datetime
 import logging
+from datetime import date, datetime
 
+import homeassistant.helpers.entity_registry as er
 from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
@@ -15,12 +16,12 @@ from homeassistant.core import (
 )
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-import homeassistant.helpers.entity_registry as er
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
+from homeassistant.util import slugify
 
 from .api import FostPlusApi
 from .const import DOMAIN, MANUFACTURER, WEBSITE
@@ -65,6 +66,7 @@ async def async_setup_entry(
     zip_code_id: str = config["zipCodeId"]
     street_id: str = config["streetId"]
     house_number: int = config["houseNumber"]
+    entity_id_prefix: str = config_entry.options.get("entity_id_prefix", "")
 
     unique_id = app_info["unique_id"]
     entities = [
@@ -76,6 +78,7 @@ async def async_setup_entry(
             unique_id=f"{unique_id}-calendar",
             device_info=app_info["collect_device"],
             fractions=fractions,
+            entity_id_prefix=entity_id_prefix,
         )
     ]
 
@@ -101,6 +104,7 @@ async def async_setup_entry(
                     f"{unique_id}-{park_id}-calendar",
                     park_id,
                     device_info,
+                    entity_id_prefix=entity_id_prefix,
                 )
             )
 
@@ -124,6 +128,7 @@ class RecycleAppCalendarEntity(
         unique_id: str,
         fractions: dict[str, tuple[str, str]],
         device_info: DeviceInfo,
+        entity_id_prefix: str = "",
     ) -> None:
         """Initialize a Calendar entity.
 
@@ -145,6 +150,8 @@ class RecycleAppCalendarEntity(
         self._attr_unique_id = unique_id
         self._attr_device_info = device_info
         self._remove_change_listener: CALLBACK_TYPE | None = None
+        if entity_id_prefix:
+            self.entity_id = f"calendar.{slugify(entity_id_prefix)}"
 
     @property
     def event(self) -> CalendarEvent | None:
