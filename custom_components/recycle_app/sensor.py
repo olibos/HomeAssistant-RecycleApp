@@ -206,18 +206,10 @@ class RecycleAppEntity(
 
     @property
     def native_value(self) -> date | None:
-        if self.coordinator.data is None:
-            _LOGGER.debug(f"Coordinator data is None for {self.entity_id}")
-        if self._fraction not in self.coordinator.data:
-            _LOGGER.debug(
-                f"Fraction {self._fraction} not found in coordinator data for {self.entity_id}"
-            )
-        return (
-            self.coordinator.data[self._fraction][0]
-            if self.coordinator.data is not None
-            and self._fraction in self.coordinator.data
-            else None
-        )
+        if not self.coordinator.data or self._fraction not in self.coordinator.data:
+            _LOGGER.debug(f"No data for fraction {self._fraction} in {self.entity_id}")
+            return None
+        return self.coordinator.data[self._fraction][0]
 
     @property
     def available(self) -> bool:
@@ -308,6 +300,9 @@ class RecycleAppDateSensor(RecycleAppEntity):
             if fraction_id in self.coordinator.data
             and date_value in self.coordinator.data[fraction_id]
         ]
+
+        if not fractions_on_date:
+            return None
 
         # Set extra state attributes
         self._attr_extra_state_attributes["date"] = self._formatted_date
