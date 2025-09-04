@@ -1,5 +1,6 @@
 {
   "name": "RecycleApp",
   "render_readme": true,
-  "country": "BE"
+  "country": "BE",
+  "homeassistant": "2024.12.0"
 }
