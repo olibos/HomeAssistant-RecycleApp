@@ -39,7 +39,7 @@ class FostPlusApi:
             {
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Encoding": "gzip, deflate",
-                "User-Agent": "HomeAssistant-RecycleApp",
+                "User-Agent": "Workaround-RecycleApp",
                 "x-consumer": "recycleapp.be",
             }
         )
