@@ -94,3 +94,6 @@ The flow offers a flexible way to process and distribute your waste collection d
 
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
+
+## License
+This project is licensed under the [MIT License](LICENSE).
