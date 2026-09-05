@@ -18,7 +18,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 from homeassistant.util import slugify
 
-from .api import FostPlusApi
+from .api import client as api
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER, WEBSITE
 from .info import AppInfo
 from .opening_hours_entity import DAYS_OF_WEEK, OpeningHoursEntity
@@ -55,7 +55,6 @@ async def async_setup_entry(
     parks: list[str] = config_entry.options.get("parks", [])
 
     if len(parks) > 0 and recycling_park_zip_code:
-        api = FostPlusApi()
         parks_found = await hass.async_add_executor_job(
             api.get_recycling_parks, recycling_park_zip_code, language
         )

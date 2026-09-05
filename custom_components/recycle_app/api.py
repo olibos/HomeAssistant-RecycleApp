@@ -1,5 +1,7 @@
 """FostPlus API."""
 
+import logging
+import threading
 from array import array
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -8,6 +10,7 @@ from requests import Session
 
 from .const import COLLECTION_TYPES
 
+_LOGGER = logging.getLogger(__name__)
 
 class FostPlusApi:
     """FostPlus API client for interacting with the RecycleApp.be API.
@@ -21,7 +24,8 @@ class FostPlusApi:
     """
 
     __session: Session | None = None
-    __endpoint: str
+    __endpoint: str | None = None
+    __initialization_lock = threading.Lock()
 
     def initialize(self) -> None:
         """Ensure the API client is initialized.
@@ -31,23 +35,37 @@ class FostPlusApi:
         self.__ensure_initialization()
 
     def __ensure_initialization(self):
-        if self.__session:
+        # Fast path: check if already initialized
+        if self.__session is not None and self.__endpoint is not None:
             return
 
-        self.__session = Session()
-        self.__session.headers.update(
-            {
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Encoding": "gzip, deflate",
-                "User-Agent": "Workaround-RecycleApp",
-                "x-consumer": "recycleapp.be",
-            }
-        )
+        # Acquire lock for thread-safe initialization
+        with self.__initialization_lock:
+            # Double-check after acquiring lock
+            if self.__session is not None and self.__endpoint is not None:
+                return
 
-        base_url = self.__session.get(
-            "https://www.recycleapp.be/config/app.settings.json"
-        ).json()["API"]
-        self.__endpoint = f"{base_url}/public/v1"
+            try:
+                _LOGGER.debug("Initialize FostPLusApi")
+                self.__session = Session()
+                self.__session.headers.update(
+                    {
+                        "Accept": "application/json, text/plain, */*",
+                        "Accept-Encoding": "gzip, deflate",
+                        "User-Agent": "Workaround-RecycleApp",
+                        "x-consumer": "recycleapp.be",
+                    }
+                )
+
+                base_url = self.__session.get(
+                    "https://www.recycleapp.be/config/app.settings.json"
+                ).json()["API"]
+                self.__endpoint = f"{base_url}/public/v1"
+            except Exception:
+                # Reset on failure to allow retry
+                self.__session = None
+                self.__endpoint = None
+                raise
 
     def __post(self, action: str, data=None):
         self.__ensure_initialization()
@@ -317,3 +335,5 @@ class FostPlusApiException(Exception):
     def code(self: "FostPlusApiException") -> str:
         """Return the code of the exception."""
         return self.__code
+
+client = FostPlusApi()

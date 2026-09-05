@@ -11,7 +11,7 @@ from homeassistant.data_entry_flow import FlowError, FlowResult
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.selector import selector
 
-from .api import FostPlusApi, FostPlusApiException
+from .api import client as api, FostPlusApiException
 from .const import DEFAULT_DATE_FORMAT, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -97,7 +97,6 @@ class RecycleAppConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         if info is not None:
             try:
-                api = FostPlusApi()
                 language: str = info["language"]
                 entity_id_prefix: str = info["entity_id_prefix"]
                 zip_codes = (
@@ -255,7 +254,6 @@ class RecycleAppOptionsFlowHandler(config_entries.OptionsFlow):
     ) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
-            api = FostPlusApi()
             zip_code_id = self.config_entry.data.get("zipCodeId")
             street_id = self.config_entry.data.get("streetId")
             house_umber = self.config_entry.data.get("houseNumber")

@@ -23,7 +23,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 from homeassistant.util import slugify
 
-from .api import FostPlusApi
+from .api import client as api
 from .const import DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
 from .recycling_park_calendar import RecyclingParkCalendarEntity
@@ -236,7 +236,6 @@ class RecycleAppCalendarEntity(
                 sorted by start date.
 
         """
-        api = FostPlusApi()
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = er.async_get(hass)
         collections: dict[str, list[date]] = await self.hass.async_add_executor_job(
