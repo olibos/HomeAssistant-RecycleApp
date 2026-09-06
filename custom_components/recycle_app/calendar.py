@@ -1,7 +1,7 @@
 """RecycleApp Calendar."""
 
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import homeassistant.helpers.entity_registry as er
 from homeassistant import config_entries
@@ -24,7 +24,7 @@ from homeassistant.helpers.update_coordinator import (
 from homeassistant.util import slugify
 
 from .api import client as api
-from .const import DOMAIN, MANUFACTURER, WEBSITE
+from .const import DEFAULT_COLLECTION_RANGE, DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
 from .recycling_park_calendar import RecyclingParkCalendarEntity
 
@@ -219,12 +219,36 @@ class RecycleAppCalendarEntity(
             self._remove_change_listener()
         self._remove_change_listener = None
 
+    async def _async_get_events_from_cache_or_api(
+        self, start_date: datetime, end_date: datetime
+    ) -> dict[str, list[date]]:
+        """Get collection events from coordinator cache or API."""
+        requested_start = start_date.date()
+        requested_end = end_date.date()
+        today = date.today()
+
+        if (
+            self.coordinator.data is not None
+            and requested_start >= today
+            and requested_end <= today + DEFAULT_COLLECTION_RANGE
+        ):
+            return self.coordinator.data
+
+        return await self.hass.async_add_executor_job(
+            api.get_collections,
+            self._zip_code_id,
+            self._street_id,
+            self._house_number,
+            start_date,
+            end_date,
+        )
+
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
         """Return calendar events within a datetime range.
 
-        This is only called when opening the calendar in the UI.
+        Serves events from the coordinator cache when possible to avoid redundant API calls.
 
         Args:
             hass: The Home Assistant instance.
@@ -238,13 +262,12 @@ class RecycleAppCalendarEntity(
         """
         base_id = self.unique_id.replace("-calendar", "-")
         entity_registry = er.async_get(hass)
-        collections: dict[str, list[date]] = await self.hass.async_add_executor_job(
-            api.get_collections,
-            self._zip_code_id,
-            self._street_id,
-            self._house_number,
-            start_date,
-            end_date,
+
+        requested_start = start_date.date()
+        requested_end = end_date.date()
+
+        collections = await self._async_get_events_from_cache_or_api(
+            start_date, end_date
         )
 
         events = [
@@ -263,6 +286,7 @@ class RecycleAppCalendarEntity(
             )
             if (state := hass.states.get(entity_id))
             for d in dates
+            if requested_start <= d <= requested_end
         ]
 
         return sorted(events, key=lambda e: e.start)
