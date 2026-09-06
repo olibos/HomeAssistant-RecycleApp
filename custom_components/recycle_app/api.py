@@ -91,22 +91,24 @@ class FostPlusApi:
 
     def __post(self, action: str, data=None):
         self.__ensure_initialization()
-        _LOGGER.debug("POST request to action: %s", action)
+        cleaned_action = action.partition("?")[0]
+        _LOGGER.debug("POST request to action: %s", cleaned_action)
         for _ in range(2):
             response = self.__session.post(f"{self.__endpoint}/{action}", json=data)
             if response.status_code == 200:
                 return response.json()
-        _LOGGER.debug("POST request to action: %s failed after 2 attempts", action)
+        _LOGGER.debug("POST request to action: %s failed after 2 attempts", cleaned_action)
         return None
 
     def __get(self, action: str):
         self.__ensure_initialization()
-        _LOGGER.debug("GET request to action: %s", action)
+        cleaned_action = action.partition("?")[0]
+        _LOGGER.debug("GET request to action: %s", cleaned_action)
         for _ in range(2):
             response = self.__session.get(f"{self.__endpoint}/{action}")
             if response.status_code == 200:
                 return response.json()
-        _LOGGER.debug("GET request to action: %s failed after 2 attempts", action)
+        _LOGGER.debug("GET request to action: %s failed after 2 attempts", cleaned_action)
         return None
 
     def __load_all(self, action: str, size: int = 100):
