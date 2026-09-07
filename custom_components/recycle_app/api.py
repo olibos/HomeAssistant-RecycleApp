@@ -1,5 +1,6 @@
 """FostPlus API."""
 
+import uuid
 from array import array
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -7,6 +8,8 @@ from datetime import date, datetime, timedelta
 from requests import Session
 
 from .const import COLLECTION_TYPES
+
+INSTANCE_ID = uuid.uuid4().hex[:8]
 
 
 class FostPlusApi:
@@ -39,7 +42,7 @@ class FostPlusApi:
             {
                 "Accept": "application/json, text/plain, */*",
                 "Accept-Encoding": "gzip, deflate",
-                "User-Agent": "Workaround-RecycleApp",
+                "User-Agent": f"RecycleApp-HA-{INSTANCE_ID}",
                 "x-consumer": "recycleapp.be",
             }
         )
