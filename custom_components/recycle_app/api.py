@@ -2,12 +2,37 @@
 
 from array import array
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
+import json
+import logging
+from pathlib import Path
+import threading
 
 from requests import Session
 
-from .const import COLLECTION_TYPES
+from .const import COLLECTION_TYPES, DEFAULT_COLLECTION_RANGE
 
+_LOGGER = logging.getLogger(__name__)
+
+
+def _get_version() -> str:
+    try:
+        manifest_path = Path(__file__).parent / "manifest.json"
+        with manifest_path.open(encoding="utf-8") as manifest_file:
+            manifest = json.load(manifest_file)
+            return manifest.get("version", "unknown")
+    except Exception as err:
+        _LOGGER.warning("Could not load version from manifest.json: %s", err)
+        return "unknown"
+
+_LOGGER.debug("RecycleApp API version: %s", _get_version())
+
+API_USER_AGENT = (
+    f"RecycleApp-HomeAssistant/{_get_version()} "
+    "(+https://tinyurl.com/recycle-app)"
+)
+
+_LOGGER.debug("RecycleApp API user agent: %s", API_USER_AGENT)
 
 class FostPlusApi:
     """FostPlus API client for interacting with the RecycleApp.be API.
@@ -21,7 +46,8 @@ class FostPlusApi:
     """
 
     __session: Session | None = None
-    __endpoint: str
+    __endpoint: str | None = None
+    __initialization_lock = threading.Lock()
 
     def initialize(self) -> None:
         """Ensure the API client is initialized.
@@ -31,38 +57,58 @@ class FostPlusApi:
         self.__ensure_initialization()
 
     def __ensure_initialization(self):
-        if self.__session:
+        # Fast path: check if already initialized
+        if self.__session is not None and self.__endpoint is not None:
             return
 
-        self.__session = Session()
-        self.__session.headers.update(
-            {
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Encoding": "gzip, deflate",
-                "User-Agent": "Workaround-RecycleApp",
-                "x-consumer": "recycleapp.be",
-            }
-        )
+        # Acquire lock for thread-safe initialization
+        with self.__initialization_lock:
+            # Double-check after acquiring lock
+            if self.__session is not None and self.__endpoint is not None:
+                return
 
-        base_url = self.__session.get(
-            "https://www.recycleapp.be/config/app.settings.json"
-        ).json()["API"]
-        self.__endpoint = f"{base_url}/public/v1"
+            try:
+                _LOGGER.debug("Initialize FostPLusApi")
+                self.__session = Session()
+                self.__session.headers.update(
+                    {
+                        "Accept": "application/json, text/plain, */*",
+                        "Accept-Encoding": "gzip, deflate",
+                        "User-Agent": API_USER_AGENT,
+                        "x-consumer": "recycleapp.be",
+                    }
+                )
+
+                base_url = self.__session.get(
+                    "https://www.recycleapp.be/config/app.settings.json"
+                ).json()["API"]
+                self.__endpoint = f"{base_url}/public/v1"
+            except Exception:
+                # Reset on failure to allow retry
+                self.__session = None
+                self.__endpoint = None
+                raise
 
     def __post(self, action: str, data=None):
         self.__ensure_initialization()
+        cleaned_action = action.partition("?")[0]
+        _LOGGER.debug("POST request to action: %s", cleaned_action)
         for _ in range(2):
             response = self.__session.post(f"{self.__endpoint}/{action}", json=data)
             if response.status_code == 200:
                 return response.json()
+        _LOGGER.debug("POST request to action: %s failed after 2 attempts", cleaned_action)
         return None
 
     def __get(self, action: str):
         self.__ensure_initialization()
+        cleaned_action = action.partition("?")[0]
+        _LOGGER.debug("GET request to action: %s", cleaned_action)
         for _ in range(2):
             response = self.__session.get(f"{self.__endpoint}/{action}")
             if response.status_code == 200:
                 return response.json()
+        _LOGGER.debug("GET request to action: %s failed after 2 attempts", cleaned_action)
         return None
 
     def __load_all(self, action: str, size: int = 100):
@@ -266,7 +312,7 @@ class FostPlusApi:
         if not from_date:
             from_date = datetime.now()
         if not until_date:
-            until_date = from_date + timedelta(weeks=8)
+            until_date = from_date + DEFAULT_COLLECTION_RANGE
         result: dict[str, list[date]] = defaultdict(list)
         EMPTY_DICT = {}
         collections: array[dict] = self.__get(
@@ -317,3 +363,5 @@ class FostPlusApiException(Exception):
     def code(self: "FostPlusApiException") -> str:
         """Return the code of the exception."""
         return self.__code
+
+client = FostPlusApi()

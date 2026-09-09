@@ -13,7 +13,7 @@ from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import FostPlusApi
+from .api import client as api
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
 
@@ -74,7 +74,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     config = entry.data
     options = entry.options
-    api = FostPlusApi()
 
     zip_code_id: str = config["zipCodeId"]
     street_id: str = config["streetId"]

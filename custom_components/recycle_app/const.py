@@ -1,6 +1,7 @@
 """RecycleApp Constants."""
 
 from base64 import b64encode
+from datetime import timedelta
 from typing import Final
 
 DOMAIN: Final = "recycle_app"
@@ -41,6 +42,7 @@ COLLECTION_TYPES["5d610b86162c063cc0400111"] = COLLECTION_TYPES[
 ]
 
 DEFAULT_DATE_FORMAT: Final = "%Y-%m-%d"
+DEFAULT_COLLECTION_RANGE: Final = timedelta(weeks=8)
 
 
 def get_icon(collection_type_id: str, color: str):
