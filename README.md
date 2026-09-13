@@ -95,5 +95,10 @@ The flow offers a flexible way to process and distribute your waste collection d
 ## Bug, ideas?
 If some collections are missing, you find a bug or have enhancement ideas don't hesitate to open an [issue](https://github.com/olibos/HomeAssistant-RecycleApp/issues/new).
 
+## API Fair Use & Credits
+A warm thank you to **FostPlus** for providing the RecycleApp service.
+
+This integration is designed to use their public API respectfully and responsibly. If you represent FostPlus and wish to get in touch or learn more about the technical measures in place, please refer to [API Fair Use Policy & Information](docs/api-fair-use.md).
+
 ## License
 This project is licensed under the [MIT License](LICENSE).
