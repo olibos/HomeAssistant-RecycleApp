@@ -82,7 +82,75 @@ async def async_setup_entry(
                 for day_of_week in DAYS_OF_WEEK
             ]
 
+    entities += [
+        RecycleAppCollectionDaySensor(
+            app_info["collect_coordinator"],
+            f"{unique_id}-today",
+            0,
+            fractions,
+            app_info["collect_device"],
+            entity_id_prefix,
+        ),
+        RecycleAppCollectionDaySensor(
+            app_info["collect_coordinator"],
+            f"{unique_id}-tomorrow",
+            1,
+            fractions,
+            app_info["collect_device"],
+            entity_id_prefix,
+        ),
+    ]
+
     async_add_entities(entities)
+
+
+class RecycleAppCollectionDaySensor(
+    CoordinatorEntity[DataUpdateCoordinator[dict[str, list[date]]]], SensorEntity
+):
+    """Sensor that lists all fractions collected on a given day offset."""
+
+    def __init__(
+        self,
+        coordinator: DataUpdateCoordinator[dict[str, list[date]]],
+        unique_id: str,
+        day_offset: int,
+        fractions: dict[str, tuple[str, str]],
+        device_info: dict[str, Any] | None = None,
+        entity_id_prefix: str = "",
+    ) -> None:
+        super().__init__(coordinator)
+        self._day_offset = day_offset
+        self._fractions = fractions
+        self._attr_unique_id = unique_id
+        self._attr_device_info = device_info
+        label = "today" if day_offset == 0 else "tomorrow"
+        self.entity_description = SensorEntityDescription(
+            key=f"collection_{label}",
+            translation_key=f"collection_{label}",
+            has_entity_name=True,
+            icon="mdi:trash-can",
+        )
+        prefix = slugify(entity_id_prefix) if entity_id_prefix else ""
+        self.entity_id = (
+            f"sensor.{prefix}_collection_{label}" if prefix else f"sensor.collection_{label}"
+        )
+
+    @property
+    def native_value(self) -> str:
+        if self.coordinator.data is None:
+            return ""
+        target = date.today() + timedelta(days=self._day_offset)
+        return ", ".join(
+            name
+            for fraction, (_, name) in self._fractions.items()
+            if fraction in self.coordinator.data
+            and self.coordinator.data[fraction]
+            and self.coordinator.data[fraction][0] == target
+        )
+
+    @property
+    def icon(self) -> str:
+        return "mdi:trash-can" if self.native_value else "mdi:delete-empty"
 
 
 class RecycleAppEntity(

@@ -41,6 +41,12 @@
   },
   "entity": {
     "sensor": {
+      "collection_today": {
+        "name": "Collection today"
+      },
+      "collection_tomorrow": {
+        "name": "Collection tomorrow"
+      },
       "opening_hours_friday": {
         "name": "Friday"
       },
