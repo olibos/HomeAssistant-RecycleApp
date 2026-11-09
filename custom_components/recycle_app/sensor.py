@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
 )
-from homeassistant.util import slugify
+from homeassistant.util import dt as dt_util, slugify
 
 from .api import client as api
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER, WEBSITE
@@ -139,13 +139,13 @@ class RecycleAppCollectionDaySensor(
     def native_value(self) -> str:
         if self.coordinator.data is None:
             return ""
-        target = date.today() + timedelta(days=self._day_offset)
+        target = dt_util.now().date() + timedelta(days=self._day_offset)
         return ", ".join(
             name
             for fraction, (_, name) in self._fractions.items()
             if fraction in self.coordinator.data
             and self.coordinator.data[fraction]
-            and self.coordinator.data[fraction][0] == target
+            and target in self.coordinator.data[fraction]
         )
 
     @property
