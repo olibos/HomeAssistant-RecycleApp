@@ -7,10 +7,10 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
+import homeassistant.helpers.config_validation as cv
 import homeassistant.helpers.device_registry as dr
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.event import async_track_time_change
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import client as api
@@ -19,6 +19,7 @@ from .info import AppInfo
 
 PLATFORMS = [Platform.CALENDAR, Platform.SENSOR]
 _LOGGER = logging.getLogger(__name__)
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 def _get_next_retry(interval: timedelta | None) -> timedelta:
@@ -30,12 +31,6 @@ def _get_next_retry(interval: timedelta | None) -> timedelta:
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Handle options update."""
     await hass.config_entries.async_reload(entry.entry_id)
-
-
-async def async_setup(hass: HomeAssistant, _: ConfigType) -> bool:
-    """Set up the RecycleApp component from yaml configuration."""
-    hass.data.setdefault(DOMAIN, {})
-    return True
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
