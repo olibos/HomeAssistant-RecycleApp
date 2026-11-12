@@ -1,0 +1,19 @@
+name: Auto Label
+
+on:
+  # pull_request_target so PRs from forks can be labelled.
+  # SECURITY: never check out or run PR code in this workflow
+  # (it runs with a write token in the base repo context).
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  auto_label:
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-slim
+    steps:
+      - uses: release-drafter/release-drafter/autolabeler@978bb0b30c5ee8cdd332ced253758157150d43f0 # v7.10.0
