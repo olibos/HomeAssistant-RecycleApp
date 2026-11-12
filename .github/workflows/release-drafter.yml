@@ -4,19 +4,16 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, reopened, synchronize]
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
 
 jobs:
   update_release_draft:
-    permissions:
-      contents: write
-      pull-requests: write    
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
-      - uses: release-drafter/release-drafter@v7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: release-drafter/release-drafter@978bb0b30c5ee8cdd332ced253758157150d43f0 # v7.10.0
         with:
-          commitish: main
+          config-name: release-drafter.yml

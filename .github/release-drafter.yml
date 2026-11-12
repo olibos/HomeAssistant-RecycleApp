@@ -1,21 +1,22 @@
 name-template: 'v$RESOLVED_VERSION 🌈'
 tag-template: 'v$RESOLVED_VERSION'
 autolabeler:
-  - label: 'documentation'
+  - labels: ['documentation']
     files:
       - '*.md'
     branch:
       - '/docs{0,1}\/.+/'
-  - label: 'bug'
+  - labels: ['bug']
+    stop-on-match: true
     branch:
       - '/fix\/.+/'
     title:
       - '/fix/i'
-  - label: 'enhancement'
+  - labels: ['enhancement']
     branch:
       - '/feature\/.+/'
 categories:
-  - title: '💥 Breaking Changes' 
+  - title: '💥 Breaking Changes'
     labels:
       - 'breaking'
   - title: '✨ New Features'
