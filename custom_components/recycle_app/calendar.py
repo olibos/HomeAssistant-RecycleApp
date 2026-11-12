@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta
 import homeassistant.helpers.entity_registry as er
 from homeassistant import config_entries
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
-from homeassistant.const import ATTR_FRIENDLY_NAME, Platform
+from homeassistant.const import Platform
 from homeassistant.core import (
     CALLBACK_TYPE,
     Event,
@@ -153,6 +153,25 @@ class RecycleAppCalendarEntity(
         if entity_id_prefix:
             self.entity_id = f"calendar.{slugify(entity_id_prefix)}"
 
+    def _get_sensor_name(
+        self, entity_registry: er.EntityRegistry, entity_id: str, fraction_id: str
+    ) -> str:
+        """Return the sensor's own name, without the device name.
+
+        HA >= 2026.11 prefixes the device name in friendly_name and exposes the
+        entity-only name as RegistryEntry.entity_name (same as the entity_name()
+        template function). Older versions never prefixed our names, so the
+        registry name / original_name is already the bare fraction name.
+        """
+        if entry := entity_registry.async_get(entity_id):
+            if name := (
+                getattr(entry, "entity_name", None)
+                or entry.name
+                or entry.original_name
+            ):
+                return name
+        return self._fractions.get(fraction_id, ("", fraction_id))[1]
+
     @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
@@ -186,9 +205,7 @@ class RecycleAppCalendarEntity(
                 labels = []
                 next_collect = event_dates[0]
             labels.append(
-                state.attributes.get(
-                    ATTR_FRIENDLY_NAME, self._fractions[fraction_id][1]
-                )
+                self._get_sensor_name(entity_registry, entity_id, fraction_id)
             )
 
         @callback
@@ -274,8 +291,8 @@ class RecycleAppCalendarEntity(
             CalendarEvent(
                 start=d,
                 end=d,
-                summary=state.attributes.get(
-                    ATTR_FRIENDLY_NAME, self._fractions[collection_type][1]
+                summary=self._get_sensor_name(
+                    entity_registry, entity_id, collection_type
                 ),
             )
             for collection_type, dates in collections.items()
@@ -284,7 +301,7 @@ class RecycleAppCalendarEntity(
                     Platform.SENSOR, DOMAIN, base_id + collection_type
                 )
             )
-            if (state := hass.states.get(entity_id))
+            if hass.states.get(entity_id)
             for d in dates
             if requested_start <= d <= requested_end
         ]
