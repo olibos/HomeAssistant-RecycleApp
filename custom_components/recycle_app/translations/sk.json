@@ -41,6 +41,12 @@
   },
   "entity": {
     "sensor": {
+      "collection_today": {
+        "name": "Zbierka dnes"
+      },
+      "collection_tomorrow": {
+        "name": "Zbierka zajtra"
+      },
       "opening_hours_friday": {
         "name": "Piatok"
       },
