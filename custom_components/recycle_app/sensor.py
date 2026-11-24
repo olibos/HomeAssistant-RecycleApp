@@ -12,6 +12,7 @@ from homeassistant.components.sensor import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_change
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
     DataUpdateCoordinator,
@@ -134,6 +135,25 @@ class RecycleAppCollectionDaySensor(
         self.entity_id = (
             f"sensor.{prefix}_collection_{label}" if prefix else f"sensor.collection_{label}"
         )
+
+    async def async_added_to_hass(self) -> None:
+        """Re-evaluate the state at local midnight, from cached data only."""
+        await super().async_added_to_hass()
+
+        @callback
+        def _async_midnight(_now: datetime) -> None:
+            self.async_write_ha_state()
+
+        self.async_on_remove(
+            async_track_time_change(
+                self.hass, _async_midnight, hour=0, minute=0, second=0
+            )
+        )
+
+    @property
+    def available(self) -> bool:
+        """Stay available on cached data even if the last refresh failed."""
+        return self.coordinator.data is not None
 
     @property
     def native_value(self) -> str:

@@ -141,8 +141,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     @callback
     async def async_refresh(_now: datetime | None = None):
         nonlocal last_refresh
-        is_midnight = _now is not None
-        if is_midnight or (datetime.now() - last_refresh).total_seconds() > 120:
+        if (datetime.now() - last_refresh).total_seconds() > 120:
             last_refresh = datetime.now()
             _LOGGER.debug("async_refresh %s", unique_id)
             await asyncio.gather(
