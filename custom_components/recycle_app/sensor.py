@@ -9,7 +9,9 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorEntityDescription,
 )
-from homeassistant.core import HomeAssistant, callback
+import homeassistant.helpers.entity_registry as er
+from homeassistant.const import Platform
+from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_change
@@ -22,6 +24,7 @@ from homeassistant.util import dt as dt_util, slugify
 from .api import client as api
 from .const import DEFAULT_DATE_FORMAT, DOMAIN, get_icon, MANUFACTURER, WEBSITE
 from .info import AppInfo
+from .naming import get_fraction_name
 from .opening_hours_entity import DAYS_OF_WEEK, OpeningHoursEntity
 
 
@@ -86,20 +89,13 @@ async def async_setup_entry(
     entities += [
         RecycleAppCollectionDaySensor(
             app_info["collect_coordinator"],
-            f"{unique_id}-today",
-            0,
+            unique_id,
+            day_offset,
             fractions,
             app_info["collect_device"],
             entity_id_prefix,
-        ),
-        RecycleAppCollectionDaySensor(
-            app_info["collect_coordinator"],
-            f"{unique_id}-tomorrow",
-            1,
-            fractions,
-            app_info["collect_device"],
-            entity_id_prefix,
-        ),
+        )
+        for day_offset in (0, 1)
     ]
 
     async_add_entities(entities)
@@ -113,18 +109,22 @@ class RecycleAppCollectionDaySensor(
     def __init__(
         self,
         coordinator: DataUpdateCoordinator[dict[str, list[date]]],
-        unique_id: str,
+        base_unique_id: str,
         day_offset: int,
         fractions: dict[str, tuple[str, str]],
         device_info: dict[str, Any] | None = None,
         entity_id_prefix: str = "",
     ) -> None:
         super().__init__(coordinator)
+        label = "today" if day_offset == 0 else "tomorrow"
         self._day_offset = day_offset
         self._fractions = fractions
-        self._attr_unique_id = unique_id
+        # Fraction sensors are registered as f"{base_unique_id}-{fraction}".
+        self._fraction_unique_ids = {
+            f"{base_unique_id}-{fraction}": fraction for fraction in fractions
+        }
+        self._attr_unique_id = f"{base_unique_id}-{label}"
         self._attr_device_info = device_info
-        label = "today" if day_offset == 0 else "tomorrow"
         self.entity_description = SensorEntityDescription(
             key=f"collection_{label}",
             translation_key=f"collection_{label}",
@@ -150,6 +150,35 @@ class RecycleAppCollectionDaySensor(
             )
         )
 
+        # Renaming a fraction sensor changes no state, so nothing else would
+        # refresh the names listed here until the next coordinator update.
+        entity_registry = er.async_get(self.hass)
+
+        @callback
+        def _is_fraction_rename(event_data: er.EventEntityRegistryUpdatedData) -> bool:
+            if event_data["action"] != "update" or "name" not in event_data.get(
+                "changes", {}
+            ):
+                return False
+            entry = entity_registry.async_get(event_data["entity_id"])
+            return (
+                entry is not None
+                and entry.platform == DOMAIN
+                and entry.unique_id in self._fraction_unique_ids
+            )
+
+        @callback
+        def _async_fraction_renamed(_event: Event) -> None:
+            self.async_write_ha_state()
+
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                er.EVENT_ENTITY_REGISTRY_UPDATED,
+                _async_fraction_renamed,
+                event_filter=_is_fraction_rename,
+            )
+        )
+
     @property
     def available(self) -> bool:
         """Stay available on cached data even if the last refresh failed."""
@@ -160,12 +189,18 @@ class RecycleAppCollectionDaySensor(
         if self.coordinator.data is None:
             return ""
         target = dt_util.now().date() + timedelta(days=self._day_offset)
+        entity_registry = er.async_get(self.hass)
         return ", ".join(
-            name
-            for fraction, (_, name) in self._fractions.items()
-            if fraction in self.coordinator.data
-            and self.coordinator.data[fraction]
-            and target in self.coordinator.data[fraction]
+            get_fraction_name(
+                entity_registry,
+                entity_registry.async_get_entity_id(
+                    Platform.SENSOR, DOMAIN, fraction_unique_id
+                ),
+                self._fractions,
+                fraction,
+            )
+            for fraction_unique_id, fraction in self._fraction_unique_ids.items()
+            if target in self.coordinator.data.get(fraction, ())
         )
 
     @property
