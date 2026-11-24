@@ -41,6 +41,12 @@
   },
   "entity": {
     "sensor": {
+      "collection_today": {
+        "name": "Ophaling vandaag"
+      },
+      "collection_tomorrow": {
+        "name": "Ophaling morgen"
+      },
       "opening_hours_friday": {
         "name": "Vrijdag"
       },
