@@ -150,14 +150,14 @@ class RecycleAppCollectionDaySensor(
             )
         )
 
-        # Renaming a fraction sensor changes no state, so nothing else would
-        # refresh the names listed here until the next coordinator update.
+        # Renaming or disabling a fraction sensor changes no state, so nothing
+        # else would refresh the list here until the next coordinator update.
         entity_registry = er.async_get(self.hass)
 
         @callback
-        def _is_fraction_rename(event_data: er.EventEntityRegistryUpdatedData) -> bool:
-            if event_data["action"] != "update" or "name" not in event_data.get(
-                "changes", {}
+        def _is_fraction_registry_change(event_data: er.EventEntityRegistryUpdatedData) -> bool:
+            if event_data["action"] != "update" or not (
+                event_data.get("changes", {}).keys() & {"name", "disabled_by"}
             ):
                 return False
             entry = entity_registry.async_get(event_data["entity_id"])
@@ -168,14 +168,14 @@ class RecycleAppCollectionDaySensor(
             )
 
         @callback
-        def _async_fraction_renamed(_event: Event) -> None:
+        def _async_fraction_changed(_event: Event) -> None:
             self.async_write_ha_state()
 
         self.async_on_remove(
             self.hass.bus.async_listen(
                 er.EVENT_ENTITY_REGISTRY_UPDATED,
-                _async_fraction_renamed,
-                event_filter=_is_fraction_rename,
+                _async_fraction_changed,
+                event_filter=_is_fraction_registry_change,
             )
         )
 
@@ -190,18 +190,22 @@ class RecycleAppCollectionDaySensor(
             return ""
         target = dt_util.now().date() + timedelta(days=self._day_offset)
         entity_registry = er.async_get(self.hass)
-        return ", ".join(
-            get_fraction_name(
-                entity_registry,
-                entity_registry.async_get_entity_id(
-                    Platform.SENSOR, DOMAIN, fraction_unique_id
-                ),
-                self._fractions,
-                fraction,
+        names: list[str] = []
+        for fraction_unique_id, fraction in self._fraction_unique_ids.items():
+            if target not in self.coordinator.data.get(fraction, ()):
+                continue
+            entity_id = entity_registry.async_get_entity_id(
+                Platform.SENSOR, DOMAIN, fraction_unique_id
             )
-            for fraction_unique_id, fraction in self._fraction_unique_ids.items()
-            if target in self.coordinator.data.get(fraction, ())
-        )
+            # Skip fractions whose sensor the user disabled. A missing registry
+            # entry (not registered yet at startup) falls back to the config name.
+            if entity_id and (entry := entity_registry.async_get(entity_id)):
+                if entry.disabled:
+                    continue
+            names.append(
+                get_fraction_name(entity_registry, entity_id, self._fractions, fraction)
+            )
+        return ", ".join(names)
 
     @property
     def icon(self) -> str:
