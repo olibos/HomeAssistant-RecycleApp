@@ -26,6 +26,7 @@ from homeassistant.util import slugify
 from .api import client as api
 from .const import DEFAULT_COLLECTION_RANGE, DOMAIN, MANUFACTURER, WEBSITE
 from .info import AppInfo
+from .naming import get_fraction_name
 from .recycling_park_calendar import RecyclingParkCalendarEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -156,21 +157,10 @@ class RecycleAppCalendarEntity(
     def _get_sensor_name(
         self, entity_registry: er.EntityRegistry, entity_id: str, fraction_id: str
     ) -> str:
-        """Return the sensor's own name, without the device name.
-
-        HA >= 2026.11 prefixes the device name in friendly_name and exposes the
-        entity-only name as RegistryEntry.entity_name (same as the entity_name()
-        template function). Older versions never prefixed our names, so the
-        registry name / original_name is already the bare fraction name.
-        """
-        if entry := entity_registry.async_get(entity_id):
-            if name := (
-                getattr(entry, "entity_name", None)
-                or entry.name
-                or entry.original_name
-            ):
-                return name
-        return self._fractions.get(fraction_id, ("", fraction_id))[1]
+        """Return the sensor's own name, without the device name."""
+        return get_fraction_name(
+            entity_registry, entity_id, self._fractions, fraction_id
+        )
 
     @property
     def event(self) -> CalendarEvent | None:

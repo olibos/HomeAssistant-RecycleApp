@@ -2,7 +2,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=olibos_HomeAssistant-RecycleApp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=olibos_HomeAssistant-RecycleApp)
 
-Integrate [RecycleApp](https://recycleapp.be/) into your Home Assistant.
+Waste collection & recycling park schedules for Belgium with [RecycleApp](https://recycleapp.be/) (Fost Plus).
 
 ## Installation
 * Install HACS Repository:
